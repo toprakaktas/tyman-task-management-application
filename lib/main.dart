@@ -2,19 +2,22 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:tyman/authentication/authenticationPage.dart';
 import 'package:tyman/firebase_options.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:tyman/screens/home/home.dart';
 
 Future<void> main() async {
+  final apiKey = dotenv.env['API_KEY'];
+  await dotenv.load(fileName: ".env");
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  initializeDateFormatting().then((_) => runApp(const MyApp()));
+  initializeDateFormatting().then((_) => runApp(MyApp(apiKey: apiKey)));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  const MyApp({super.key, String? apiKey});
 
   // This widget is the root of your application.
   @override
