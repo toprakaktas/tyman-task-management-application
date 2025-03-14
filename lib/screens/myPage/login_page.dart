@@ -1,6 +1,5 @@
-// ignore_for_file: file_names
 import 'package:flutter/material.dart';
-import 'package:tyman/authentication/authenticationData.dart';
+import 'package:tyman/authentication/authentication_data.dart';
 import 'dart:math';
 import 'package:tyman/constants/colors.dart';
 

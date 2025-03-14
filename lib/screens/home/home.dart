@@ -6,12 +6,12 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:tyman/constants/colors.dart';
-import 'package:tyman/screens/detail/taskData.dart';
+import 'package:tyman/screens/detail/task_data.dart';
 import 'package:tyman/screens/home/widgets/tasks.dart';
-import 'package:tyman/screens/home/widgets/upcomingTasks.dart';
-import 'package:tyman/screens/myPage/myPage.dart';
+import 'package:tyman/screens/home/widgets/upcoming_tasks.dart';
+import 'package:tyman/screens/myPage/my_page.dart';
 import 'package:tyman/services/firestore_services.dart';
-import 'package:tyman/models/taskModel.dart';
+import 'package:tyman/models/task_model.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -92,7 +92,7 @@ class HomePageState extends State<HomePage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const upcomingTasks(),
+                  const UpcomingTasks(),
                   Container(
                     padding: const EdgeInsets.all(15),
                     child: const Text(

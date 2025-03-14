@@ -1,5 +1,3 @@
-// ignore_for_file: file_names
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class TaskData {
@@ -28,11 +26,10 @@ class TaskData {
   factory TaskData.fromFirestore(DocumentSnapshot doc) {
     Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
     return TaskData(
-      id: doc.id,
-      category: data['category'] as String,
-      description: data['description'] as String,
-      dueDateTime: (data['dueDateTime'] as Timestamp).toDate(),
-      completed: data['completed'] ?? false
-    );
+        id: doc.id,
+        category: data['category'] as String,
+        description: data['description'] as String,
+        dueDateTime: (data['dueDateTime'] as Timestamp).toDate(),
+        completed: data['completed'] ?? false);
   }
 }

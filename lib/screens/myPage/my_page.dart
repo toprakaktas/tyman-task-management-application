@@ -1,5 +1,3 @@
-// ignore_for_file: file_names
-
 import 'dart:math';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -9,7 +7,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
-import 'package:tyman/authentication/authenticationData.dart';
+import 'package:tyman/authentication/authentication_data.dart';
 import 'package:tyman/constants/colors.dart';
 import 'package:tyman/screens/home/home.dart';
 import 'package:tyman/services/firestore_services.dart';

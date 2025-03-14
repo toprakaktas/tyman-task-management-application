@@ -1,8 +1,6 @@
-// ignore_for_file: file_names
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:tyman/authentication/authenticationPage.dart';
+import 'package:tyman/authentication/authentication_page.dart';
 import 'package:tyman/screens/home/home.dart';
 import 'package:tyman/services/firestore_services.dart';
 
@@ -51,8 +49,8 @@ class AuthenticationData extends AutenticationDataSource {
   Future<void> logout(BuildContext context) async {
     try {
       await FirebaseAuth.instance.signOut();
-      Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (context) => const AuthenticationService()));
+      Navigator.of(context).pushReplacement(MaterialPageRoute(
+          builder: (context) => const AuthenticationService()));
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Error signing out. Try again.')));

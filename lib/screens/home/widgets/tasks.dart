@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:tyman/models/taskModel.dart';
+import 'package:tyman/models/task_model.dart';
 import 'package:tyman/screens/detail/detail.dart';
 
 class Tasks extends StatefulWidget {
@@ -18,8 +18,8 @@ class _TasksState extends State<Tasks> {
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 2, crossAxisSpacing: 10, mainAxisSpacing: 10),
       itemBuilder: (context, index) {
-          final task = widget.taskCategories[index];
-          return buildTask(context, task);
+        final task = widget.taskCategories[index];
+        return buildTask(context, task);
       },
     );
   }
@@ -27,9 +27,14 @@ class _TasksState extends State<Tasks> {
   Widget buildTask(BuildContext context, TaskModel task) {
     return GestureDetector(
       onTap: () {
-        Navigator.of(context).push(
-          MaterialPageRoute(builder: (context) => DetailPage(categoryFilter: task.title,)),).then((_) => setState(() {})
-        ); 
+        Navigator.of(context)
+            .push(
+              MaterialPageRoute(
+                  builder: (context) => DetailPage(
+                        categoryFilter: task.title,
+                      )),
+            )
+            .then((_) => setState(() {}));
       },
       child: Card(
         elevation: 3.0, // Shadow

@@ -1,9 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
-import 'package:tyman/models/taskModel.dart';
-import 'package:tyman/screens/detail/taskData.dart';
-import 'package:tyman/screens/myPage/myPage.dart';
+import 'package:tyman/models/task_model.dart';
+import 'package:tyman/screens/detail/task_data.dart';
+import 'package:tyman/screens/myPage/my_page.dart';
 import 'package:uuid/uuid.dart';
 
 class FirestoreService {
@@ -27,7 +27,8 @@ class FirestoreService {
 
   Future<AppUser?> fetchUserProfile(String uid) async {
     try {
-      DocumentSnapshot userDoc = await firestore.collection('users').doc(uid).get();
+      DocumentSnapshot userDoc =
+          await firestore.collection('users').doc(uid).get();
 
       if (userDoc.exists) {
         Map<String, dynamic> userData = userDoc.data() as Map<String, dynamic>;
@@ -43,7 +44,8 @@ class FirestoreService {
     }
   }
 
-  Future<void> updateProfile(AppUser appUser, String name, String email, String photo) async {
+  Future<void> updateProfile(
+      AppUser appUser, String name, String email, String photo) async {
     try {
       await firestore.collection('users').doc(appUser.uid).update({
         'name': name,
@@ -115,7 +117,7 @@ class FirestoreService {
   }
 
   Future<List<TaskData>> getTasksByCategoryAndDate(
-    String category, DateTime date) async {
+      String category, DateTime date) async {
     DateTime start = DateTime(date.year, date.month, date.day, 0, 0);
     DateTime end = DateTime(date.year, date.month, date.day, 23, 59, 59);
     if (kDebugMode) {
@@ -165,7 +167,7 @@ class FirestoreService {
       if (kDebugMode) {
         print('Documents Retrieved: ${snapshot.docs.length}');
       }
-      
+
       int leftCount = 0;
       int doneCount = 0;
 
@@ -173,7 +175,8 @@ class FirestoreService {
         if (kDebugMode) {
           print('Document Data: ${doc.data()}');
         }
-        bool completed = (doc.data() as Map<String, dynamic>)['completed'] ?? false;
+        bool completed =
+            (doc.data() as Map<String, dynamic>)['completed'] ?? false;
         if (completed == false) {
           leftCount++;
         } else if (completed == true) {

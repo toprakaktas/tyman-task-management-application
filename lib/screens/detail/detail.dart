@@ -4,9 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:tyman/constants/colors.dart';
-import 'package:tyman/screens/detail/taskData.dart';
-import 'package:tyman/screens/detail/widgets/datePicker.dart';
-import 'package:tyman/screens/detail/widgets/taskTitle.dart';
+import 'package:tyman/screens/detail/task_data.dart';
+import 'package:tyman/screens/detail/widgets/date_picker.dart';
+import 'package:tyman/screens/detail/widgets/task_title.dart';
 import 'package:tyman/screens/home/home.dart';
 import 'package:tyman/services/firestore_services.dart';
 

@@ -1,8 +1,6 @@
-// ignore_for_file: file_names
-
 import 'package:flutter/material.dart';
-import 'package:tyman/screens/myPage/loginPage.dart';
-import 'package:tyman/screens/myPage/signUpPage.dart';
+import 'package:tyman/screens/myPage/login_page.dart';
+import 'package:tyman/screens/myPage/signup_page.dart';
 
 class AuthenticationService extends StatefulWidget {
   const AuthenticationService({super.key});

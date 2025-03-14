@@ -1,10 +1,8 @@
-// ignore_for_file: file_names, camel_case_types
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:tyman/models/taskModel.dart';
-import 'package:tyman/screens/detail/taskData.dart';
+import 'package:tyman/models/task_model.dart';
+import 'package:tyman/screens/detail/task_data.dart';
 import 'package:tyman/services/firestore_services.dart';
 
 class UpcomingTasksPage extends StatefulWidget {

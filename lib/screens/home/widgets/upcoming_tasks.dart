@@ -1,18 +1,17 @@
-// ignore_for_file: file_names, camel_case_types
-
 import 'package:flutter/material.dart';
-import 'package:tyman/screens/upcomingTasksPage.dart';
+import 'package:tyman/screens/upcoming_tasks_page.dart';
 
-class upcomingTasks extends StatelessWidget {
-  const upcomingTasks({super.key});
+class UpcomingTasks extends StatelessWidget {
+  const UpcomingTasks({super.key});
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
         Navigator.push(
-          context, 
-          MaterialPageRoute(builder: ((context) => const UpcomingTasksPage())));
+            context,
+            MaterialPageRoute(
+                builder: ((context) => const UpcomingTasksPage())));
       },
       child: Stack(
         children: [
@@ -27,8 +26,7 @@ class upcomingTasks extends StatelessWidget {
                 Container(
                     padding: const EdgeInsets.all(5),
                     decoration: BoxDecoration(
-                        color: Colors.grey[800], shape: BoxShape.circle
-                        ),
+                        color: Colors.grey[800], shape: BoxShape.circle),
                     child: const Icon(Icons.timelapse,
                         color: Colors.white, size: 25)),
                 const SizedBox(width: 15),
