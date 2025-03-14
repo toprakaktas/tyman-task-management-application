@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:tyman/screens/myPage/login_page.dart';
-import 'package:tyman/screens/myPage/signup_page.dart';
+import 'package:tyman/screens/myPage/sign_up_page.dart';
 
 class AuthenticationService extends StatefulWidget {
   const AuthenticationService({super.key});
