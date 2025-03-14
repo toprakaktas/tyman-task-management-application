@@ -445,7 +445,7 @@ class HomePageState extends State<HomePage> {
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.2),
+            color: Colors.grey.withValues(alpha: 0.2),
             spreadRadius: 5,
             blurRadius: 10,
           ),
@@ -461,7 +461,7 @@ class HomePageState extends State<HomePage> {
             showSelectedLabels: true,
             showUnselectedLabels: true,
             selectedItemColor: const Color.fromARGB(255, 63, 117, 212),
-            unselectedItemColor: Colors.grey.withOpacity(0.75),
+            unselectedItemColor: Colors.grey.withValues(alpha: 0.75),
             items: const [
               BottomNavigationBarItem(
                 label: 'Home',

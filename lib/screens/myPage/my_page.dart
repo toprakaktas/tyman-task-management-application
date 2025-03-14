@@ -260,7 +260,7 @@ class MyPageState extends State<MyPage> {
       showSelectedLabels: true,
       showUnselectedLabels: true,
       selectedItemColor: const Color.fromARGB(255, 63, 117, 212),
-      unselectedItemColor: Colors.grey.withOpacity(0.75),
+      unselectedItemColor: Colors.grey.withValues(alpha: 0.75),
       currentIndex: _selectedIndex,
       items: const [
         BottomNavigationBarItem(

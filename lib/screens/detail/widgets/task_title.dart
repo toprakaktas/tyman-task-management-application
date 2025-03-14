@@ -26,7 +26,7 @@ class TaskTitleState extends State<TaskTitle> {
           Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-                color: Colors.grey.withOpacity(0.30),
+                color: Colors.grey.withValues(alpha: 0.30),
                 borderRadius: BorderRadius.circular(25)),
             child: PopupMenuButton<String>(
               onSelected: (String value) {
