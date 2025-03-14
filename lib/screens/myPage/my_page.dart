@@ -108,13 +108,17 @@ class MyPageState extends State<MyPage> {
         'photoUrl': appUser!.photo,
       });
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Profile updated successfully')),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Profile updated successfully')),
+        );
+      }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Error updating profile')),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Error updating profile')),
+        );
+      }
     }
   }
 
@@ -123,7 +127,9 @@ class MyPageState extends State<MyPage> {
       await authService.logout(context);
     } catch (e) {
       const snackBar = SnackBar(content: Text('Error signing out. Try again.'));
-      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(snackBar);
+      }
     }
   }
 

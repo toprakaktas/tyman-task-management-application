@@ -373,11 +373,19 @@ class _DetailPageState extends State<DetailPage> {
             tasksFuture = loadTasks();
           });
         }
-        _showCustomAlertDialog(context, 'Success', 'Task updated successfully!',
-            Icons.check_circle, CupertinoColors.activeGreen);
+        if (mounted) {
+          _showCustomAlertDialog(
+              context,
+              'Success',
+              'Task updated successfully!',
+              Icons.check_circle,
+              CupertinoColors.activeGreen);
+        }
       } catch (e) {
-        _showCustomAlertDialog(context, 'Error', 'Failed to update task: $e',
-            Icons.error, Colors.red);
+        if (mounted) {
+          _showCustomAlertDialog(context, 'Error', 'Failed to update task: $e',
+              Icons.error, Colors.red);
+        }
       }
     }
   }
@@ -424,11 +432,15 @@ class _DetailPageState extends State<DetailPage> {
             tasksFuture = loadTasks();
           });
         }
-        _showCustomAlertDialog(context, 'Success',
-            'Task deleted successfully!.', Icons.delete, Colors.red);
+        if (mounted) {
+          _showCustomAlertDialog(context, 'Success',
+              'Task deleted successfully!.', Icons.delete, Colors.red);
+        }
       } catch (e) {
-        _showCustomAlertDialog(context, 'Error', 'Failed to delete task: $e',
-            Icons.error, Colors.red);
+        if (mounted) {
+          _showCustomAlertDialog(context, 'Error', 'Failed to delete task: $e',
+              Icons.error, Colors.red);
+        }
       }
     }
   }
@@ -452,121 +464,116 @@ class _DetailPageState extends State<DetailPage> {
       String message = updatedTask.completed
           ? 'Well done! You have completed the task!'
           : 'Task marked as not completed.';
-      _showCustomAlertDialog(
-          context, 'Success', message, Icons.check_circle, Colors.green);
+      if (mounted) {
+        _showCustomAlertDialog(
+            context, 'Success', message, Icons.check_circle, Colors.green);
+      }
     } catch (e) {
-      _showCustomAlertDialog(context, 'Error',
-          'Failed to mark task as done: $e', Icons.error, Colors.red);
+      if (mounted) {
+        _showCustomAlertDialog(context, 'Error',
+            'Failed to mark task as done: $e', Icons.error, Colors.red);
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () async {
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (context) => const HomePage()),
-        );
-        return false;
-      },
-      child: Scaffold(
-        backgroundColor: Colors.black,
-        body: FutureBuilder<List<TaskData>>(
-          future: tasksFuture,
-          builder: (context, snapshot) {
-            int taskLeft = 0;
-            if (snapshot.hasData && snapshot.data != null) {
-              taskLeft = snapshot.data!
-                  .where((task) => task.completed == false)
-                  .length;
-            }
-            List<Widget> slivers = [
-              buildAppBar(context, taskLeft),
-              SliverToBoxAdapter(
+    return Scaffold(
+      backgroundColor: Colors.black,
+      body: FutureBuilder<List<TaskData>>(
+        future: tasksFuture,
+        builder: (context, snapshot) {
+          int taskLeft = 0;
+          if (snapshot.hasData && snapshot.data != null) {
+            taskLeft =
+                snapshot.data!.where((task) => task.completed == false).length;
+          }
+          List<Widget> slivers = [
+            buildAppBar(context, taskLeft),
+            SliverToBoxAdapter(
+              child: Container(
+                decoration: const BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(30),
+                      topRight: Radius.circular(30)),
+                ),
+                child: Column(
+                  children: [
+                    DatePicker(onDateChanged: onDateSelected),
+                    TaskTitle(onFilterSelected: onFilterSelected),
+                  ],
+                ),
+              ),
+            ),
+          ];
+
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            slivers.add(
+              const SliverFillRemaining(
+                child: Center(child: CircularProgressIndicator()),
+              ),
+            );
+          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+            slivers.add(
+              SliverFillRemaining(
                 child: Container(
-                  decoration: const BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(30),
-                        topRight: Radius.circular(30)),
-                  ),
-                  child: Column(
-                    children: [
-                      DatePicker(onDateChanged: onDateSelected),
-                      TaskTitle(onFilterSelected: onFilterSelected),
-                    ],
+                  color: Colors.white,
+                  child: const Center(
+                    child: Text('There are no tasks for today.',
+                        style: TextStyle(color: Colors.grey, fontSize: 18)),
                   ),
                 ),
               ),
-            ];
-
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              slivers.add(
-                const SliverFillRemaining(
-                  child: Center(child: CircularProgressIndicator()),
-                ),
-              );
-            } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-              slivers.add(
-                SliverFillRemaining(
-                  child: Container(
-                    color: Colors.white,
-                    child: const Center(
-                      child: Text('There are no tasks for today.',
-                          style: TextStyle(color: Colors.grey, fontSize: 18)),
-                    ),
-                  ),
-                ),
-              );
-            } else {
-              slivers.add(
-                SliverList(
-                  delegate: SliverChildBuilderDelegate(
-                    (_, index) {
-                      TaskData task = snapshot.data![index];
-                      return Card(
-                        margin: const EdgeInsets.symmetric(
-                            vertical: 3, horizontal: 1),
-                        color: task.completed
-                            ? markedTaskColor
-                            : CupertinoColors.systemGrey5,
-                        child: ListTile(
-                          leading: IconButton(
-                            onPressed: () => markTaskAsDone(task),
-                            icon: const Icon(CupertinoIcons.check_mark_circled,
-                                color: completeTaskColor),
-                          ),
-                          title: Text(task.description,
-                              style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                              )),
-                          subtitle:
-                              Text('Due Time: ${formatDate(task.dueDateTime)}'),
-                          trailing: Wrap(spacing: 5, children: <Widget>[
-                            IconButton(
-                                onPressed: () => editTask(task),
-                                icon: const Icon(CupertinoIcons.pen)),
-                            IconButton(
-                                onPressed: () => deleteTask(task),
-                                icon: const Icon(
-                                  CupertinoIcons.trash,
-                                  color: Color(0xFFF74F43),
-                                )),
-                          ]),
-                        ),
-                      );
-                    },
-                    childCount: snapshot.data!.length,
-                  ),
-                ),
-              );
-            }
-
-            return CustomScrollView(
-              slivers: slivers,
             );
-          },
-        ),
+          } else {
+            slivers.add(
+              SliverList(
+                delegate: SliverChildBuilderDelegate(
+                  (_, index) {
+                    TaskData task = snapshot.data![index];
+                    return Card(
+                      margin: const EdgeInsets.symmetric(
+                          vertical: 3, horizontal: 1),
+                      color: task.completed
+                          ? markedTaskColor
+                          : CupertinoColors.systemGrey5,
+                      child: ListTile(
+                        leading: IconButton(
+                          onPressed: () => markTaskAsDone(task),
+                          icon: const Icon(CupertinoIcons.check_mark_circled,
+                              color: completeTaskColor),
+                        ),
+                        title: Text(task.description,
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                            )),
+                        subtitle:
+                            Text('Due Time: ${formatDate(task.dueDateTime)}'),
+                        trailing: Wrap(spacing: 5, children: <Widget>[
+                          IconButton(
+                              onPressed: () => editTask(task),
+                              icon: const Icon(CupertinoIcons.pen)),
+                          IconButton(
+                              onPressed: () => deleteTask(task),
+                              icon: const Icon(
+                                CupertinoIcons.trash,
+                                color: Color(0xFFF74F43),
+                              )),
+                        ]),
+                      ),
+                    );
+                  },
+                  childCount: snapshot.data!.length,
+                ),
+              ),
+            );
+          }
+
+          return CustomScrollView(
+            slivers: slivers,
+          );
+        },
       ),
     );
   }

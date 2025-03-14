@@ -19,11 +19,13 @@ class AuthenticationData extends AutenticationDataSource {
         .signInWithEmailAndPassword(
             email: email.trim(), password: password.trim())
         .then((value) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-          content: Text('Successfully logged in!'),
-          behavior: SnackBarBehavior.floating));
-      Navigator.pushReplacement(
-          context, MaterialPageRoute(builder: (context) => const HomePage()));
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+            content: Text('Successfully logged in!'),
+            behavior: SnackBarBehavior.floating));
+        Navigator.pushReplacement(
+            context, MaterialPageRoute(builder: (context) => const HomePage()));
+      }
     });
   }
 
@@ -35,12 +37,14 @@ class AuthenticationData extends AutenticationDataSource {
           .createUserWithEmailAndPassword(
               email: email.trim(), password: password.trim())
           .then((value) {
-        FirestoreService().createUser(email);
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-            content: Text('Successfully signed up!'),
-            behavior: SnackBarBehavior.floating));
-        Navigator.pushReplacement(
-            context, MaterialPageRoute(builder: (context) => const HomePage()));
+        if (context.mounted) {
+          FirestoreService().createUser(email);
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+              content: Text('Successfully signed up!'),
+              behavior: SnackBarBehavior.floating));
+          Navigator.pushReplacement(context,
+              MaterialPageRoute(builder: (context) => const HomePage()));
+        }
       });
     }
   }
@@ -49,11 +53,15 @@ class AuthenticationData extends AutenticationDataSource {
   Future<void> logout(BuildContext context) async {
     try {
       await FirebaseAuth.instance.signOut();
-      Navigator.of(context).pushReplacement(MaterialPageRoute(
-          builder: (context) => const AuthenticationService()));
+      if (context.mounted) {
+        Navigator.of(context).pushReplacement(MaterialPageRoute(
+            builder: (context) => const AuthenticationService()));
+      }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Error signing out. Try again.')));
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Error signing out. Try again.')));
+      }
     }
   }
 }

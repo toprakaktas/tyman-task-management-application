@@ -375,9 +375,11 @@ class HomePageState extends State<HomePage> {
                               selectedTime.minute),
                         );
                         FirestoreService().addTask(newTask).then((_) {
-                          Navigator.of(context).pop();
-                          _refreshData();
-                          _showSnackBar('Task successfully added!');
+                          if (context.mounted) {
+                            Navigator.of(context).pop();
+                            _refreshData();
+                            _showSnackBar('Task successfully added!');
+                          }
                         });
                       },
                       child: const Text(
