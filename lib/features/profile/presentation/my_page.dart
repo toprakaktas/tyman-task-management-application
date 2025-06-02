@@ -7,33 +7,11 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
-import 'package:tyman/authentication/authentication_data.dart';
-import 'package:tyman/constants/colors.dart';
-import 'package:tyman/screens/home/home.dart';
-import 'package:tyman/services/firestore_services.dart';
-
-class AppUser {
-  final String uid;
-  String name;
-  final String email;
-  String photo;
-
-  AppUser({
-    required this.uid,
-    required this.name,
-    required this.email,
-    this.photo = 'assets/images/userAvatar.png',
-  });
-
-  factory AppUser.fromFirestore(Map<String, dynamic> data, String uid) {
-    return AppUser(
-      uid: uid,
-      name: data['name'] ?? 'Earthling',
-      email: data['email'] ?? '',
-      photo: data['photoUrl'] as String? ?? 'assets/images/userAvatar.png',
-    );
-  }
-}
+import 'package:tyman/features/authentication/data/authentication_data.dart';
+import 'package:tyman/core/constants/colors.dart';
+import 'package:tyman/features/tasks/presentation/home.dart';
+import 'package:tyman/data/services/firestore_services.dart';
+import 'package:tyman/data/models/app_user.dart';
 
 class MyPage extends StatefulWidget {
   const MyPage({super.key});

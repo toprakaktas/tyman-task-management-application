@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:tyman/screens/upcoming_tasks_page.dart';
+import 'package:tyman/features/tasks/presentation/upcoming_tasks_page.dart';
 
 class UpcomingTasks extends StatelessWidget {
   const UpcomingTasks({super.key});

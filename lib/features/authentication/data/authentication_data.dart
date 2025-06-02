@@ -1,17 +1,17 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:tyman/authentication/authentication_page.dart';
-import 'package:tyman/screens/home/home.dart';
-import 'package:tyman/services/firestore_services.dart';
+import 'package:tyman/features/authentication/presentation/authentication_wrapper.dart';
+import 'package:tyman/features/tasks/presentation/home.dart';
+import 'package:tyman/data/services/firestore_services.dart';
 
-abstract class AutenticationDataSource {
+abstract class AuthenticationDataSource {
   Future<void> signUp(String email, String password, String passwordConfirm,
       BuildContext context);
   Future<void> logIn(String email, String password, BuildContext context);
   Future<void> logout(BuildContext context);
 }
 
-class AuthenticationData extends AutenticationDataSource {
+class AuthenticationData extends AuthenticationDataSource {
   @override
   Future<void> logIn(
       String email, String password, BuildContext context) async {
@@ -55,7 +55,7 @@ class AuthenticationData extends AutenticationDataSource {
       await FirebaseAuth.instance.signOut();
       if (context.mounted) {
         Navigator.of(context).pushReplacement(MaterialPageRoute(
-            builder: (context) => const AuthenticationService()));
+            builder: (context) => const AuthenticationWrapper()));
       }
     } catch (e) {
       if (context.mounted) {

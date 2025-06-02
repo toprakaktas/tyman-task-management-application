@@ -5,13 +5,14 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:tyman/constants/colors.dart';
-import 'package:tyman/screens/detail/task_data.dart';
-import 'package:tyman/screens/home/widgets/tasks.dart';
-import 'package:tyman/screens/home/widgets/upcoming_tasks.dart';
-import 'package:tyman/screens/myPage/my_page.dart';
-import 'package:tyman/services/firestore_services.dart';
-import 'package:tyman/models/task_model.dart';
+import 'package:tyman/core/constants/colors.dart';
+import 'package:tyman/data/models/app_user.dart';
+import 'package:tyman/data/models/task_data.dart';
+import 'package:tyman/features/tasks/presentation/widgets/tasks.dart';
+import 'package:tyman/features/profile/presentation/my_page.dart';
+import 'package:tyman/data/services/firestore_services.dart';
+import 'package:tyman/data/models/task_model.dart';
+import 'package:tyman/features/tasks/presentation/widgets/upcoming_tasks.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});

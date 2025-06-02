@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:tyman/authentication/authentication_data.dart';
+import 'package:tyman/features/authentication/data/authentication_data.dart';
 import 'dart:math';
-import 'package:tyman/constants/colors.dart';
+import 'package:tyman/core/constants/colors.dart';
 
 class SignUpPage extends StatefulWidget {
   final VoidCallback show;

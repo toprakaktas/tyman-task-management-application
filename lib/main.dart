@@ -1,12 +1,10 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:tyman/authentication/authentication_page.dart';
-import 'package:tyman/firebase_options.dart';
+import 'package:tyman/features/authentication/presentation/authentication_wrapper.dart';
+import 'package:tyman/firebase/firebase_options.dart';
 import 'package:intl/date_symbol_data_local.dart';
-import 'package:tyman/screens/home/home.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -28,26 +26,6 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'TyMan',
       home: AuthenticationWrapper(),
-    );
-  }
-}
-
-class AuthenticationWrapper extends StatelessWidget {
-  const AuthenticationWrapper({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return StreamBuilder<User?>(
-      stream: FirebaseAuth.instance.authStateChanges(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const CircularProgressIndicator();
-        } else if (snapshot.hasData) {
-          return const HomePage();
-        } else {
-          return const AuthenticationService();
-        }
-      },
     );
   }
 }
