@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
-import 'package:tyman/constants/utils.dart';
+import 'package:tyman/core/utils/utils.dart';
 
 class DatePicker extends StatefulWidget {
   final Function(DateTime) onDateChanged;

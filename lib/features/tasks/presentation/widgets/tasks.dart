@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:tyman/models/task_model.dart';
-import 'package:tyman/screens/detail/detail.dart';
+import 'package:tyman/data/models/task_model.dart';
+import 'package:tyman/features/tasks/presentation/detail.dart';
 
 class Tasks extends StatefulWidget {
   final List<TaskModel> taskCategories;

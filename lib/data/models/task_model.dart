@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:tyman/constants/colors.dart';
+import 'package:tyman/core/constants/colors.dart';
 
 class TaskModel {
   final IconData iconData;

@@ -1,9 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
-import 'package:tyman/models/task_model.dart';
-import 'package:tyman/screens/detail/task_data.dart';
-import 'package:tyman/screens/myPage/my_page.dart';
+import 'package:tyman/data/models/app_user.dart';
+import 'package:tyman/data/models/task_model.dart';
+import 'package:tyman/data/models/task_data.dart';
 import 'package:uuid/uuid.dart';
 
 class FirestoreService {

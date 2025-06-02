@@ -3,12 +3,12 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:table_calendar/table_calendar.dart';
-import 'package:tyman/constants/colors.dart';
-import 'package:tyman/screens/detail/task_data.dart';
-import 'package:tyman/screens/detail/widgets/date_picker.dart';
-import 'package:tyman/screens/detail/widgets/task_title.dart';
-import 'package:tyman/screens/home/home.dart';
-import 'package:tyman/services/firestore_services.dart';
+import 'package:tyman/core/constants/colors.dart';
+import 'package:tyman/data/models/task_data.dart';
+import 'package:tyman/features/tasks/presentation/widgets/date_picker.dart';
+import 'package:tyman/features/tasks/presentation/home.dart';
+import 'package:tyman/data/services/firestore_services.dart';
+import 'package:tyman/features/tasks/presentation/widgets/task_title.dart';
 
 class DetailPage extends StatefulWidget {
   final String categoryFilter;
