@@ -1,16 +1,15 @@
 import 'dart:math';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:tyman/data/services/user_service.dart';
 import 'dart:io';
 import 'package:tyman/features/authentication/data/authentication_data.dart';
 import 'package:tyman/core/constants/colors.dart';
 import 'package:tyman/features/tasks/presentation/home.dart';
-import 'package:tyman/data/services/firestore_services.dart';
 import 'package:tyman/data/models/app_user.dart';
 
 class MyPage extends StatefulWidget {
@@ -26,7 +25,7 @@ class MyPageState extends State<MyPage> {
   final User? firebaseUser = FirebaseAuth.instance.currentUser;
   final TextEditingController nameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
-  final FirestoreService firestoreService = FirestoreService();
+  final UserService userService = UserService();
   final AuthenticationData authService = AuthenticationData();
   final _selectedIndex = 1;
   bool _isEditMode = false;
@@ -34,7 +33,7 @@ class MyPageState extends State<MyPage> {
   @override
   void initState() {
     super.initState();
-    firestoreService.fetchUserProfile(firebaseUser!.uid).then((AppUser? user) {
+    userService.fetchUserProfile(firebaseUser!.uid).then((AppUser? user) {
       if (mounted) {
         setState(() {
           appUser = user;

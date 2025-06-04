@@ -5,9 +5,9 @@ import 'package:intl/intl.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:tyman/core/constants/colors.dart';
 import 'package:tyman/data/models/task_data.dart';
+import 'package:tyman/data/services/task_service.dart';
 import 'package:tyman/features/tasks/presentation/widgets/date_picker.dart';
 import 'package:tyman/features/tasks/presentation/home.dart';
-import 'package:tyman/data/services/firestore_services.dart';
 import 'package:tyman/features/tasks/presentation/widgets/task_title.dart';
 
 class DetailPage extends StatefulWidget {
@@ -29,7 +29,7 @@ class _DetailPageState extends State<DetailPage> {
   }
 
   Future<List<TaskData>> loadTasks() async {
-    List<TaskData> tasks = await FirestoreService()
+    List<TaskData> tasks = await TaskService()
         .getTasksByCategoryAndDate(widget.categoryFilter, selectedDate);
     if (selectedFilter == 'Deadline') {
       tasks.sort(((a, b) => a.dueDateTime.compareTo(b.dueDateTime)));
@@ -367,7 +367,7 @@ class _DetailPageState extends State<DetailPage> {
 
     if (editedTask != null) {
       try {
-        await FirestoreService().updateTask(editedTask);
+        await TaskService().updateTask(editedTask);
         if (mounted) {
           setState(() {
             tasksFuture = loadTasks();
@@ -426,7 +426,7 @@ class _DetailPageState extends State<DetailPage> {
 
     if (confirm == true) {
       try {
-        await FirestoreService().deleteTask(task.id);
+        await TaskService().deleteTask(task.id);
         if (mounted) {
           setState(() {
             tasksFuture = loadTasks();
@@ -455,7 +455,7 @@ class _DetailPageState extends State<DetailPage> {
     );
 
     try {
-      await FirestoreService().updateTask(updatedTask);
+      await TaskService().updateTask(updatedTask);
       if (mounted) {
         setState(() {
           tasksFuture = loadTasks();

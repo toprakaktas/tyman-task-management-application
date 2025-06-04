@@ -8,9 +8,10 @@ import 'package:intl/intl.dart';
 import 'package:tyman/core/constants/colors.dart';
 import 'package:tyman/data/models/app_user.dart';
 import 'package:tyman/data/models/task_data.dart';
+import 'package:tyman/data/services/task_service.dart';
+import 'package:tyman/data/services/user_service.dart';
 import 'package:tyman/features/tasks/presentation/widgets/tasks.dart';
 import 'package:tyman/features/profile/presentation/my_page.dart';
-import 'package:tyman/data/services/firestore_services.dart';
 import 'package:tyman/data/models/task_model.dart';
 import 'package:tyman/features/tasks/presentation/widgets/upcoming_tasks.dart';
 
@@ -28,14 +29,14 @@ class HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    taskCategories = FirestoreService().fetchTaskCountsForCategories();
+    taskCategories = TaskService().fetchTaskCountsForCategories();
     fetchUserData();
   }
 
   Future<void> fetchUserData() async {
     User? firebaseUser = FirebaseAuth.instance.currentUser;
     if (firebaseUser != null) {
-      appUser = await FirestoreService().fetchUserProfile(firebaseUser.uid);
+      appUser = await UserService().fetchUserProfile(firebaseUser.uid);
       if (mounted) {
         setState(() {});
       }
@@ -45,7 +46,7 @@ class HomePageState extends State<HomePage> {
   Future<void> _refreshData() async {
     if (mounted) {
       setState(() {
-        taskCategories = FirestoreService().fetchTaskCountsForCategories();
+        taskCategories = TaskService().fetchTaskCountsForCategories();
       });
     }
   }
@@ -375,7 +376,7 @@ class HomePageState extends State<HomePage> {
                               selectedTime.hour,
                               selectedTime.minute),
                         );
-                        FirestoreService().addTask(newTask).then((_) {
+                        TaskService().addTask(newTask).then((_) {
                           if (context.mounted) {
                             Navigator.of(context).pop();
                             _refreshData();
