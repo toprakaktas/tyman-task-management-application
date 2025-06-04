@@ -1,8 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:tyman/data/services/user_service.dart';
 import 'package:tyman/features/authentication/presentation/authentication_wrapper.dart';
 import 'package:tyman/features/tasks/presentation/home.dart';
-import 'package:tyman/data/services/firestore_services.dart';
 
 abstract class AuthenticationDataSource {
   Future<void> signUp(String email, String password, String passwordConfirm,
@@ -38,7 +38,7 @@ class AuthenticationData extends AuthenticationDataSource {
               email: email.trim(), password: password.trim())
           .then((value) {
         if (context.mounted) {
-          FirestoreService().createUser(email);
+          UserService().createUser(email);
           ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
               content: Text('Successfully signed up!'),
               behavior: SnackBarBehavior.floating));

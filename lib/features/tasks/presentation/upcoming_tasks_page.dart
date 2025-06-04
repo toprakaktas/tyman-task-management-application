@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:tyman/data/models/task_model.dart';
 import 'package:tyman/data/models/task_data.dart';
-import 'package:tyman/data/services/firestore_services.dart';
+import 'package:tyman/data/services/task_service.dart';
 
 class UpcomingTasksPage extends StatefulWidget {
   const UpcomingTasksPage({super.key});
@@ -18,7 +18,7 @@ class UpcomingTasksPageState extends State<UpcomingTasksPage> {
   @override
   void initState() {
     super.initState();
-    _tasksForToday = FirestoreService().fetchTasksForToday();
+    _tasksForToday = TaskService().fetchTasksForToday();
   }
 
   @override
