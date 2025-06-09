@@ -30,7 +30,7 @@ class _DetailPageState extends State<DetailPage> {
 
   Future<List<TaskData>> loadTasks() async {
     List<TaskData> tasks = await TaskService()
-        .getTasksByCategoryAndDate(widget.categoryFilter, selectedDate);
+        .fetchTasksByCategoryAndDate(widget.categoryFilter, selectedDate);
     if (selectedFilter == 'Deadline') {
       tasks.sort(((a, b) => a.dueDateTime.compareTo(b.dueDateTime)));
     } else if (selectedFilter == 'Description') {

@@ -5,9 +5,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:tyman/data/services/auth_service.dart';
 import 'package:tyman/data/services/user_service.dart';
 import 'dart:io';
-import 'package:tyman/features/authentication/data/authentication_data.dart';
 import 'package:tyman/core/constants/colors.dart';
 import 'package:tyman/features/tasks/presentation/home.dart';
 import 'package:tyman/data/models/app_user.dart';
@@ -26,7 +26,7 @@ class MyPageState extends State<MyPage> {
   final TextEditingController nameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final UserService userService = UserService();
-  final AuthenticationData authService = AuthenticationData();
+  final AuthService authService = AuthService();
   final _selectedIndex = 1;
   bool _isEditMode = false;
 

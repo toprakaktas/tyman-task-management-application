@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:tyman/features/authentication/data/authentication_data.dart';
+import 'package:tyman/data/services/auth_service.dart';
 import 'dart:math';
 import 'package:tyman/core/constants/colors.dart';
 
@@ -126,8 +126,11 @@ class SignUpPageState extends State<SignUpPage> {
       padding: const EdgeInsets.symmetric(horizontal: 100),
       child: GestureDetector(
         onTap: () {
-          AuthenticationData()
-              .signUp(email.text, password.text, passwordConfirm.text, context);
+          AuthService().signUp(
+              email: email.text,
+              password: password.text,
+              passwordConfirm: passwordConfirm.text,
+              context: context);
         },
         child: Container(
           alignment: Alignment.center,
