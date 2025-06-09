@@ -3,12 +3,14 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:tyman/data/models/task_data.dart';
 import 'package:tyman/data/models/task_model.dart';
+import 'package:tyman/domain/services/task_repository.dart';
 import 'package:uuid/uuid.dart';
 
-class TaskService {
+class TaskService implements TaskRepository {
   final FirebaseFirestore firestore = FirebaseFirestore.instance;
   final FirebaseAuth auth = FirebaseAuth.instance;
 
+  @override
   Future<bool> addTask(TaskData taskData) async {
     try {
       var uuid = const Uuid().v4();
@@ -32,6 +34,7 @@ class TaskService {
     }
   }
 
+  @override
   Future<void> deleteTask(String taskId) async {
     try {
       await firestore
@@ -50,6 +53,7 @@ class TaskService {
     }
   }
 
+  @override
   Future<void> updateTask(TaskData task) async {
     try {
       await firestore
@@ -68,7 +72,8 @@ class TaskService {
     }
   }
 
-  Future<List<TaskData>> getTasksByCategoryAndDate(
+  @override
+  Future<List<TaskData>> fetchTasksByCategoryAndDate(
       String category, DateTime date) async {
     DateTime start = DateTime(date.year, date.month, date.day, 0, 0);
     DateTime end = DateTime(date.year, date.month, date.day, 23, 59, 59);
@@ -92,6 +97,7 @@ class TaskService {
     }
   }
 
+  @override
   Future<List<TaskModel>> fetchTaskCountsForCategories() async {
     DateTime date = DateTime.now();
     DateTime start = DateTime(date.year, date.month, date.day, 0, 0);
@@ -149,6 +155,7 @@ class TaskService {
     return taskCategories;
   }
 
+  @override
   Future<List<TaskData>> fetchTasksForToday() async {
     DateTime now = DateTime.now();
     DateTime startOfDay = DateTime(now.year, now.month, now.day);
