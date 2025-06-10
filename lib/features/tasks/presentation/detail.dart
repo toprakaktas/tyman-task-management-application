@@ -6,6 +6,8 @@ import 'package:table_calendar/table_calendar.dart';
 import 'package:tyman/core/constants/colors.dart';
 import 'package:tyman/data/models/task_data.dart';
 import 'package:tyman/data/services/task_service.dart';
+import 'package:tyman/domain/usecases/task/add_task.dart';
+import 'package:tyman/domain/usecases/task/fetch_task_counts_for_categories.dart';
 import 'package:tyman/features/tasks/presentation/widgets/date_picker.dart';
 import 'package:tyman/features/tasks/presentation/home.dart';
 import 'package:tyman/features/tasks/presentation/widgets/task_title.dart';
@@ -591,8 +593,10 @@ class _DetailPageState extends State<DetailPage> {
       expandedHeight: 90,
       backgroundColor: Colors.black,
       leading: IconButton(
-        onPressed: () => Navigator.of(context)
-            .push(MaterialPageRoute(builder: (context) => const HomePage())),
+        onPressed: () => Navigator.of(context).push(MaterialPageRoute(
+            builder: (context) => HomePage(
+                fetchTaskCounts: FetchTaskCountsForCategories(TaskService()),
+                addTask: AddTask(TaskService())))),
         icon: const Icon(Icons.arrow_back_ios_new_rounded),
         iconSize: 20,
       ),

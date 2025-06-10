@@ -6,9 +6,12 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:tyman/data/services/auth_service.dart';
+import 'package:tyman/data/services/task_service.dart';
 import 'package:tyman/data/services/user_service.dart';
 import 'dart:io';
 import 'package:tyman/core/constants/colors.dart';
+import 'package:tyman/domain/usecases/task/add_task.dart';
+import 'package:tyman/domain/usecases/task/fetch_task_counts_for_categories.dart';
 import 'package:tyman/features/tasks/presentation/home.dart';
 import 'package:tyman/data/models/app_user.dart';
 
@@ -258,7 +261,12 @@ class MyPageState extends State<MyPage> {
       onTap: (index) {
         if (index == 0) {
           Navigator.of(context).push(
-            MaterialPageRoute(builder: (context) => const HomePage()),
+            MaterialPageRoute(
+                builder: (context) => HomePage(
+                      fetchTaskCounts:
+                          FetchTaskCountsForCategories(TaskService()),
+                      addTask: AddTask(TaskService()),
+                    )),
           );
         }
       },
