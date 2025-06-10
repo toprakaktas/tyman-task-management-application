@@ -8,15 +8,20 @@ import 'package:intl/intl.dart';
 import 'package:tyman/core/constants/colors.dart';
 import 'package:tyman/data/models/app_user.dart';
 import 'package:tyman/data/models/task_data.dart';
-import 'package:tyman/data/services/task_service.dart';
 import 'package:tyman/data/services/user_service.dart';
+import 'package:tyman/domain/usecases/task/add_task.dart';
+import 'package:tyman/domain/usecases/task/fetch_task_counts_for_categories.dart';
 import 'package:tyman/features/tasks/presentation/widgets/tasks.dart';
 import 'package:tyman/features/profile/presentation/my_page.dart';
 import 'package:tyman/data/models/task_model.dart';
 import 'package:tyman/features/tasks/presentation/widgets/upcoming_tasks.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+  final FetchTaskCountsForCategories fetchTaskCounts;
+  final AddTask addTask;
+
+  const HomePage(
+      {super.key, required this.fetchTaskCounts, required this.addTask});
 
   @override
   HomePageState createState() => HomePageState();
@@ -29,7 +34,7 @@ class HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    taskCategories = TaskService().fetchTaskCountsForCategories();
+    taskCategories = widget.fetchTaskCounts();
     fetchUserData();
   }
 
@@ -46,7 +51,7 @@ class HomePageState extends State<HomePage> {
   Future<void> _refreshData() async {
     if (mounted) {
       setState(() {
-        taskCategories = TaskService().fetchTaskCountsForCategories();
+        taskCategories = widget.fetchTaskCounts();
       });
     }
   }
@@ -115,294 +120,295 @@ class HomePageState extends State<HomePage> {
       bottomNavigationBar: buildBottomNavBar(context),
       floatingActionButtonLocation:
           FloatingActionButtonLocation.miniCenterDocked,
-      floatingActionButton: FloatingActionButton(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-        elevation: 0,
-        backgroundColor: Colors.black,
-        onPressed: () {
-          TextEditingController descriptionController = TextEditingController();
-          DateTime selectedDate = DateTime.now();
-          TimeOfDay selectedTime = TimeOfDay.now();
-          String dropdownValue = 'Personal';
+      floatingActionButton: buildFloatingButton(context),
+    );
+  }
 
-          Future<void> selectDate(
-              BuildContext context, StateSetter setState) async {
-            final DateTime? picked = await showDatePicker(
-              context: context,
-              initialDate: selectedDate,
-              firstDate: DateTime.now(),
-              lastDate: DateTime(2101),
-            );
-            if (picked != null && picked != selectedDate) {
-              if (mounted) {
-                setState(
-                  () {
-                    selectedDate = picked;
-                  },
-                );
-              }
-              if (kDebugMode) {
-                print('Selected Date: $selectedDate');
-              }
+  Widget buildFloatingButton(BuildContext context) {
+    return FloatingActionButton(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      elevation: 0,
+      backgroundColor: Colors.black,
+      onPressed: () {
+        TextEditingController descriptionController = TextEditingController();
+        DateTime selectedDate = DateTime.now();
+        TimeOfDay selectedTime = TimeOfDay.now();
+        String dropdownValue = 'Personal';
+
+        Future<void> selectDate(
+            BuildContext context, StateSetter setState) async {
+          final DateTime? picked = await showDatePicker(
+            context: context,
+            initialDate: selectedDate,
+            firstDate: DateTime.now(),
+            lastDate: DateTime(2101),
+          );
+          if (picked != null && picked != selectedDate) {
+            if (mounted) {
+              setState(
+                () {
+                  selectedDate = picked;
+                },
+              );
+            }
+            if (kDebugMode) {
+              print('Selected Date: $selectedDate');
             }
           }
+        }
 
-          Future<void> selectTime(
-              BuildContext context, Function updateTime) async {
-            DateTime tempSelectedTime = DateTime.now();
+        Future<void> selectTime(
+            BuildContext context, Function updateTime) async {
+          DateTime tempSelectedTime = DateTime.now();
 
-            await showCupertinoModalPopup(
-              context: context,
-              builder: (BuildContext context) {
-                return Container(
-                  color: CupertinoColors.systemGrey6,
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: <Widget>[
-                      SizedBox(
-                        height:
-                            MediaQuery.of(context).copyWith().size.height / 3,
-                        child: CupertinoDatePicker(
-                          mode: CupertinoDatePickerMode.time,
-                          initialDateTime: DateTime.now(),
-                          onDateTimeChanged: (DateTime newTime) {
-                            tempSelectedTime = newTime;
-                            if (kDebugMode) {
-                              print("New Time: $newTime");
-                            }
-                            if (mounted) {
-                              setState(() {
-                                selectedTime = TimeOfDay.fromDateTime(newTime);
-                              });
-                            }
-                          },
-                          use24hFormat: true,
-                          minuteInterval: 1,
-                        ),
+          await showCupertinoModalPopup(
+            context: context,
+            builder: (BuildContext context) {
+              return Container(
+                color: CupertinoColors.systemGrey6,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    SizedBox(
+                      height: MediaQuery.of(context).copyWith().size.height / 3,
+                      child: CupertinoDatePicker(
+                        mode: CupertinoDatePickerMode.time,
+                        initialDateTime: DateTime.now(),
+                        onDateTimeChanged: (DateTime newTime) {
+                          tempSelectedTime = newTime;
+                          if (kDebugMode) {
+                            print("New Time: $newTime");
+                          }
+                          if (mounted) {
+                            setState(() {
+                              selectedTime = TimeOfDay.fromDateTime(newTime);
+                            });
+                          }
+                        },
+                        use24hFormat: true,
+                        minuteInterval: 1,
                       ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: <Widget>[
-                          CupertinoButton(
-                            onPressed: () {
-                              Navigator.pop(context);
-                            },
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 16, vertical: 10),
-                            child: const Text('Cancel',
-                                style: TextStyle(
-                                    color: CupertinoColors.destructiveRed)),
-                          ),
-                          const SizedBox(width: 20),
-                          CupertinoButton(
-                            onPressed: () {
-                              updateTime(tempSelectedTime);
-                              Navigator.pop(context);
-                            },
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 16, vertical: 10),
-                            child: const Text('OK',
-                                style: TextStyle(color: taskColor)),
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        CupertinoButton(
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 16, vertical: 10),
+                          child: const Text('Cancel',
+                              style: TextStyle(
+                                  color: CupertinoColors.destructiveRed)),
+                        ),
+                        const SizedBox(width: 20),
+                        CupertinoButton(
+                          onPressed: () {
+                            updateTime(tempSelectedTime);
+                            Navigator.pop(context);
+                          },
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 16, vertical: 10),
+                          child: const Text('OK',
+                              style: TextStyle(color: taskColor)),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              );
+            },
+          );
+        }
+
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return StatefulBuilder(builder: (context, setState) {
+              return AlertDialog(
+                title: const Row(
+                  children: [
+                    Icon(CupertinoIcons.add_circled, color: taskColor),
+                    SizedBox(width: 10),
+                    Text(
+                      'Add New Task',
+                      style:
+                          TextStyle(color: CupertinoColors.darkBackgroundGray),
+                    ),
+                  ],
+                ),
+                content: SingleChildScrollView(
+                    child: ListBody(
+                  children: <Widget>[
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 8.0),
+                      child: Row(
+                        children: [
+                          const Icon(CupertinoIcons.collections,
+                              color: taskColor),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: DropdownButtonFormField<String>(
+                              value: dropdownValue,
+                              icon: const Icon(Icons.arrow_drop_down_rounded),
+                              elevation: 16,
+                              style: const TextStyle(
+                                  color: CupertinoColors.darkBackgroundGray),
+                              decoration: InputDecoration(
+                                labelText: 'Category',
+                                labelStyle: const TextStyle(
+                                    color: CupertinoColors.darkBackgroundGray),
+                                enabledBorder: OutlineInputBorder(
+                                  borderSide:
+                                      const BorderSide(color: Colors.grey),
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderSide:
+                                      const BorderSide(color: taskColor),
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                contentPadding: const EdgeInsets.symmetric(
+                                    horizontal: 15, vertical: 10),
+                              ),
+                              onChanged: (String? newValue) {
+                                if (mounted) {
+                                  setState(() {
+                                    dropdownValue = newValue!;
+                                  });
+                                }
+                              },
+                              items: <String>[
+                                'Personal',
+                                'Work',
+                                'Health',
+                                'Other'
+                              ].map<DropdownMenuItem<String>>((String value) {
+                                return DropdownMenuItem<String>(
+                                  value: value,
+                                  child: Text(value),
+                                );
+                              }).toList(),
+                            ),
                           ),
                         ],
                       ),
-                    ],
-                  ),
-                );
-              },
-            );
-          }
-
-          showDialog(
-            context: context,
-            builder: (BuildContext context) {
-              return StatefulBuilder(builder: (context, setState) {
-                return AlertDialog(
-                  title: const Row(
-                    children: [
-                      Icon(CupertinoIcons.add_circled, color: taskColor),
-                      SizedBox(width: 10),
-                      Text(
-                        'Add New Task',
-                        style: TextStyle(
-                            color: CupertinoColors.darkBackgroundGray),
-                      ),
-                    ],
-                  ),
-                  content: SingleChildScrollView(
-                      child: ListBody(
-                    children: <Widget>[
-                      Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 8.0),
-                        child: Row(
-                          children: [
-                            const Icon(CupertinoIcons.collections,
-                                color: taskColor),
-                            const SizedBox(width: 10),
-                            Expanded(
-                              child: DropdownButtonFormField<String>(
-                                value: dropdownValue,
-                                icon: const Icon(Icons.arrow_drop_down_rounded),
-                                elevation: 16,
-                                style: const TextStyle(
-                                    color: CupertinoColors.darkBackgroundGray),
-                                decoration: InputDecoration(
-                                  labelText: 'Category',
-                                  labelStyle: const TextStyle(
-                                      color:
-                                          CupertinoColors.darkBackgroundGray),
-                                  enabledBorder: OutlineInputBorder(
-                                    borderSide:
-                                        const BorderSide(color: Colors.grey),
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                  focusedBorder: OutlineInputBorder(
-                                    borderSide:
-                                        const BorderSide(color: taskColor),
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                  contentPadding: const EdgeInsets.symmetric(
-                                      horizontal: 15, vertical: 10),
-                                ),
-                                onChanged: (String? newValue) {
-                                  if (mounted) {
-                                    setState(() {
-                                      dropdownValue = newValue!;
-                                    });
-                                  }
-                                },
-                                items: <String>[
-                                  'Personal',
-                                  'Work',
-                                  'Health',
-                                  'Other'
-                                ].map<DropdownMenuItem<String>>((String value) {
-                                  return DropdownMenuItem<String>(
-                                    value: value,
-                                    child: Text(value),
-                                  );
-                                }).toList(),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 8.0),
-                        child: Row(
-                          children: [
-                            const Icon(CupertinoIcons.doc_plaintext,
-                                color: taskColor),
-                            const SizedBox(width: 10),
-                            Expanded(
-                              child: TextField(
-                                  controller: descriptionController,
-                                  decoration: const InputDecoration(
-                                      labelText: 'Description',
-                                      labelStyle: TextStyle(
-                                          color: CupertinoColors
-                                              .darkBackgroundGray),
-                                      enabledBorder: OutlineInputBorder(
+                    ),
+                    const SizedBox(height: 10),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 8.0),
+                      child: Row(
+                        children: [
+                          const Icon(CupertinoIcons.doc_plaintext,
+                              color: taskColor),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: TextField(
+                                controller: descriptionController,
+                                decoration: const InputDecoration(
+                                    labelText: 'Description',
+                                    labelStyle: TextStyle(
+                                        color:
+                                            CupertinoColors.darkBackgroundGray),
+                                    enabledBorder: OutlineInputBorder(
+                                      borderSide:
+                                          BorderSide(color: Colors.grey),
+                                      borderRadius:
+                                          BorderRadius.all(Radius.circular(10)),
+                                    ),
+                                    focusedBorder: OutlineInputBorder(
                                         borderSide:
-                                            BorderSide(color: Colors.grey),
+                                            BorderSide(color: taskColor),
                                         borderRadius: BorderRadius.all(
-                                            Radius.circular(10)),
-                                      ),
-                                      focusedBorder: OutlineInputBorder(
-                                          borderSide:
-                                              BorderSide(color: taskColor),
-                                          borderRadius: BorderRadius.all(
-                                              Radius.circular(10))))),
-                            ),
-                          ],
-                        ),
+                                            Radius.circular(10))))),
+                          ),
+                        ],
                       ),
-                      const SizedBox(height: 10),
-                      ListTile(
+                    ),
+                    const SizedBox(height: 10),
+                    ListTile(
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 0),
+                      leading: const Icon(
+                        CupertinoIcons.calendar_today,
+                        color: taskColor,
+                      ),
+                      title: Text(
+                          "Due Date: ${DateFormat('dd/MM/yy').format(selectedDate)}",
+                          style: const TextStyle(
+                              color: CupertinoColors.darkBackgroundGray)),
+                      trailing: const Icon(Icons.keyboard_arrow_down),
+                      onTap: () => selectDate(context, setState),
+                    ),
+                    ListTile(
                         contentPadding:
                             const EdgeInsets.symmetric(horizontal: 0),
-                        leading: const Icon(
-                          CupertinoIcons.calendar_today,
-                          color: taskColor,
-                        ),
+                        leading:
+                            const Icon(CupertinoIcons.time, color: taskColor),
                         title: Text(
-                            "Due Date: ${DateFormat('dd/MM/yy').format(selectedDate)}",
-                            style: const TextStyle(
-                                color: CupertinoColors.darkBackgroundGray)),
+                            "Due Time: ${selectedTime.hour}:${selectedTime.minute.toString().padLeft(2, '0')}"),
                         trailing: const Icon(Icons.keyboard_arrow_down),
-                        onTap: () => selectDate(context, setState),
-                      ),
-                      ListTile(
-                          contentPadding:
-                              const EdgeInsets.symmetric(horizontal: 0),
-                          leading:
-                              const Icon(CupertinoIcons.time, color: taskColor),
-                          title: Text(
-                              "Due Time: ${selectedTime.hour}:${selectedTime.minute.toString().padLeft(2, '0')}"),
-                          trailing: const Icon(Icons.keyboard_arrow_down),
-                          onTap: () => selectTime(context, (newTime) {
-                                if (mounted) {
-                                  setState((() {
-                                    selectedTime =
-                                        TimeOfDay.fromDateTime(newTime);
-                                  }));
-                                }
-                              }))
-                    ],
-                  )),
-                  actions: <Widget>[
-                    TextButton(
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                      },
-                      child: const Text(
-                        'Cancel',
-                        style: TextStyle(color: Colors.redAccent),
-                      ),
-                    ),
-                    TextButton(
-                      onPressed: () {
-                        String description = descriptionController.text;
-                        String category = dropdownValue;
-                        TaskData newTask = TaskData(
-                          id: '',
-                          category: category,
-                          description: description,
-                          dueDateTime: DateTime(
-                              selectedDate.year,
-                              selectedDate.month,
-                              selectedDate.day,
-                              selectedTime.hour,
-                              selectedTime.minute),
-                        );
-                        TaskService().addTask(newTask).then((_) {
-                          if (context.mounted) {
-                            Navigator.of(context).pop();
-                            _refreshData();
-                            _showSnackBar('Task successfully added!');
-                          }
-                        });
-                      },
-                      child: const Text(
-                        'Add Task',
-                        style: TextStyle(color: taskColor),
-                      ),
-                    ),
+                        onTap: () => selectTime(context, (newTime) {
+                              if (mounted) {
+                                setState((() {
+                                  selectedTime =
+                                      TimeOfDay.fromDateTime(newTime);
+                                }));
+                              }
+                            }))
                   ],
-                  backgroundColor: Colors.grey[200],
-                  shape: const RoundedRectangleBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(20))),
-                );
-              });
-            },
-          );
-        },
-        child: const Icon(
-          Icons.add,
-          size: 35,
-          color: Colors.white,
-        ),
+                )),
+                actions: <Widget>[
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: const Text(
+                      'Cancel',
+                      style: TextStyle(color: Colors.redAccent),
+                    ),
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      String description = descriptionController.text;
+                      String category = dropdownValue;
+                      TaskData newTask = TaskData(
+                        id: '',
+                        category: category,
+                        description: description,
+                        dueDateTime: DateTime(
+                            selectedDate.year,
+                            selectedDate.month,
+                            selectedDate.day,
+                            selectedTime.hour,
+                            selectedTime.minute),
+                      );
+                      widget.addTask(newTask).then((_) {
+                        if (context.mounted) {
+                          Navigator.of(context).pop();
+                          _refreshData();
+                          _showSnackBar('Task successfully added!');
+                        }
+                      });
+                    },
+                    child: const Text(
+                      'Add Task',
+                      style: TextStyle(color: taskColor),
+                    ),
+                  ),
+                ],
+                backgroundColor: Colors.grey[200],
+                shape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(20))),
+              );
+            });
+          },
+        );
+      },
+      child: const Icon(
+        Icons.add,
+        size: 35,
+        color: Colors.white,
       ),
     );
   }

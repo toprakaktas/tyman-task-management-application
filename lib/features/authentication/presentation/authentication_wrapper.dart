@@ -1,5 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:tyman/data/services/task_service.dart';
+import 'package:tyman/domain/usecases/task/add_task.dart';
+import 'package:tyman/domain/usecases/task/fetch_task_counts_for_categories.dart';
 import 'package:tyman/features/authentication/presentation/login_page.dart';
 import 'package:tyman/features/authentication/presentation/sign_up_page.dart';
 import 'package:tyman/features/tasks/presentation/home.dart';
@@ -30,7 +33,10 @@ class _AuthenticationWrapperState extends State<AuthenticationWrapper> {
         }
 
         if (snapshot.hasData) {
-          return const HomePage(); // User is logged in
+          return HomePage(
+            fetchTaskCounts: FetchTaskCountsForCategories(TaskService()),
+            addTask: AddTask(TaskService()),
+          ); // User is logged in
         } else {
           return showLogin
               ? LoginPage(toggleScreens)
