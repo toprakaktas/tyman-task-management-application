@@ -1,5 +1,4 @@
 import 'dart:math';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
@@ -12,11 +11,17 @@ import 'dart:io';
 import 'package:tyman/core/constants/colors.dart';
 import 'package:tyman/domain/usecases/task/add_task.dart';
 import 'package:tyman/domain/usecases/task/fetch_task_counts_for_categories.dart';
+import 'package:tyman/domain/usecases/user/fetch_user_profile.dart';
+import 'package:tyman/domain/usecases/user/update_profile.dart';
 import 'package:tyman/features/tasks/presentation/home.dart';
 import 'package:tyman/data/models/app_user.dart';
 
 class MyPage extends StatefulWidget {
-  const MyPage({super.key});
+  final FetchUserProfile fetchUserProfile;
+  final UpdateProfile updateProfile;
+
+  const MyPage(
+      {super.key, required this.fetchUserProfile, required this.updateProfile});
 
   @override
   MyPageState createState() => MyPageState();
@@ -36,7 +41,7 @@ class MyPageState extends State<MyPage> {
   @override
   void initState() {
     super.initState();
-    userService.fetchUserProfile(firebaseUser!.uid).then((AppUser? user) {
+    widget.fetchUserProfile(firebaseUser!.uid).then((AppUser? user) {
       if (mounted) {
         setState(() {
           appUser = user;
@@ -79,14 +84,8 @@ class MyPageState extends State<MyPage> {
 
   Future<void> updateProfile() async {
     try {
-      await FirebaseFirestore.instance
-          .collection('users')
-          .doc(appUser!.uid)
-          .update({
-        'name': nameController.text,
-        'email': emailController.text,
-        'photoUrl': appUser!.photo,
-      });
+      await widget.updateProfile(
+          appUser!, nameController.text, emailController.text, appUser!.photo);
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
