@@ -1,40 +1,41 @@
 import 'package:flutter/material.dart';
 import 'package:tyman/data/models/task_model.dart';
+import 'package:tyman/data/services/task_service.dart';
+import 'package:tyman/domain/usecases/task/delete_task.dart';
+import 'package:tyman/domain/usecases/task/fetch_tasks_by_category_and_date.dart';
+import 'package:tyman/domain/usecases/task/update_task.dart';
 import 'package:tyman/features/tasks/presentation/detail.dart';
 
-class Tasks extends StatefulWidget {
+class TaskGrid extends StatelessWidget {
   final List<TaskModel> taskCategories;
-  const Tasks({super.key, required this.taskCategories});
 
-  @override
-  State<Tasks> createState() => _TasksState();
-}
+  const TaskGrid({super.key, required this.taskCategories});
 
-class _TasksState extends State<Tasks> {
   @override
   Widget build(BuildContext context) {
     return GridView.builder(
-      itemCount: widget.taskCategories.length,
+      itemCount: taskCategories.length,
+      padding: EdgeInsets.symmetric(horizontal: 10),
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 2, crossAxisSpacing: 10, mainAxisSpacing: 10),
       itemBuilder: (context, index) {
-        final task = widget.taskCategories[index];
-        return buildTask(context, task);
+        final task = taskCategories[index];
+        return _buildTaskCard(context, task);
       },
     );
   }
 
-  Widget buildTask(BuildContext context, TaskModel task) {
+  Widget _buildTaskCard(BuildContext context, TaskModel task) {
     return GestureDetector(
       onTap: () {
-        Navigator.of(context)
-            .push(
-              MaterialPageRoute(
-                  builder: (context) => DetailPage(
-                        categoryFilter: task.title,
-                      )),
-            )
-            .then((_) => setState(() {}));
+        Navigator.of(context).push(MaterialPageRoute(
+          builder: (context) => DetailPage(
+              categoryFilter: task.title,
+              fetchTasksByCategoryAndDate:
+                  FetchTasksByCategoryAndDate(TaskService()),
+              updateTask: UpdateTask(TaskService()),
+              deleteTask: DeleteTask(TaskService())),
+        ));
       },
       child: Card(
         elevation: 3.0, // Shadow
@@ -63,13 +64,13 @@ class _TasksState extends State<Tasks> {
               const SizedBox(height: 25),
               Row(
                 children: [
-                  buildTaskStatus(
+                  _buildStatusChip(
                     task.btnColor,
                     task.iconColor,
                     '${task.left} left',
                   ),
                   const SizedBox(width: 5),
-                  buildTaskStatus(
+                  _buildStatusChip(
                     Colors.white,
                     task.iconColor,
                     '${task.done} done',
@@ -83,13 +84,13 @@ class _TasksState extends State<Tasks> {
     );
   }
 
-  Widget buildTaskStatus(Color bgColor, Color txtColor, String text) {
+  Widget _buildStatusChip(Color bgColor, Color txtColor, String label) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       decoration: BoxDecoration(
           color: bgColor, borderRadius: BorderRadius.circular(20)),
       child: Text(
-        text,
+        label,
         style: TextStyle(color: txtColor),
       ),
     );

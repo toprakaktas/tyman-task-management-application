@@ -7,14 +7,27 @@ import 'package:tyman/core/constants/colors.dart';
 import 'package:tyman/data/models/task_data.dart';
 import 'package:tyman/data/services/task_service.dart';
 import 'package:tyman/domain/usecases/task/add_task.dart';
+import 'package:tyman/domain/usecases/task/delete_task.dart';
 import 'package:tyman/domain/usecases/task/fetch_task_counts_for_categories.dart';
+import 'package:tyman/domain/usecases/task/fetch_tasks_by_category_and_date.dart';
+import 'package:tyman/domain/usecases/task/update_task.dart';
 import 'package:tyman/features/tasks/presentation/widgets/date_picker.dart';
 import 'package:tyman/features/tasks/presentation/home.dart';
 import 'package:tyman/features/tasks/presentation/widgets/task_title.dart';
 
 class DetailPage extends StatefulWidget {
   final String categoryFilter;
-  const DetailPage({super.key, required this.categoryFilter});
+  final FetchTasksByCategoryAndDate fetchTasksByCategoryAndDate;
+  final UpdateTask updateTask;
+  final DeleteTask deleteTask;
+
+  const DetailPage({
+    super.key,
+    required this.categoryFilter,
+    required this.fetchTasksByCategoryAndDate,
+    required this.updateTask,
+    required this.deleteTask,
+  });
 
   @override
   State<DetailPage> createState() => _DetailPageState();
@@ -23,7 +36,8 @@ class DetailPage extends StatefulWidget {
 class _DetailPageState extends State<DetailPage> {
   late Future<List<TaskData>> tasksFuture;
   DateTime selectedDate = DateTime.now();
-  String selectedFilter = 'Time';
+  String selectedFilter = 'Order By';
+
   @override
   void initState() {
     super.initState();
@@ -31,8 +45,8 @@ class _DetailPageState extends State<DetailPage> {
   }
 
   Future<List<TaskData>> loadTasks() async {
-    List<TaskData> tasks = await TaskService()
-        .fetchTasksByCategoryAndDate(widget.categoryFilter, selectedDate);
+    List<TaskData> tasks = await widget.fetchTasksByCategoryAndDate(
+        widget.categoryFilter, selectedDate);
     if (selectedFilter == 'Deadline') {
       tasks.sort(((a, b) => a.dueDateTime.compareTo(b.dueDateTime)));
     } else if (selectedFilter == 'Description') {
@@ -428,7 +442,7 @@ class _DetailPageState extends State<DetailPage> {
 
     if (confirm == true) {
       try {
-        await TaskService().deleteTask(task.id);
+        await widget.deleteTask(task.id);
         if (mounted) {
           setState(() {
             tasksFuture = loadTasks();
@@ -457,7 +471,7 @@ class _DetailPageState extends State<DetailPage> {
     );
 
     try {
-      await TaskService().updateTask(updatedTask);
+      await widget.updateTask(updatedTask);
       if (mounted) {
         setState(() {
           tasksFuture = loadTasks();
@@ -503,7 +517,9 @@ class _DetailPageState extends State<DetailPage> {
                 child: Column(
                   children: [
                     DatePicker(onDateChanged: onDateSelected),
-                    TaskTitle(onFilterSelected: onFilterSelected),
+                    TaskTitle(
+                        onFilterSelected: onFilterSelected,
+                        selectedFilter: selectedFilter),
                   ],
                 ),
               ),

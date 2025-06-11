@@ -7,18 +7,20 @@ class DatePicker extends StatefulWidget {
 
   const DatePicker({super.key, required this.onDateChanged});
   @override
-  DatePickerState createState() => DatePickerState();
+  State<DatePicker> createState() => _DatePickerState();
 }
 
-class DatePickerState extends State<DatePicker> {
+class _DatePickerState extends State<DatePicker> {
   late DateTime _selectedDay;
   late DateTime _focusedDay;
   CalendarFormat _calendarFormat = CalendarFormat.week;
-  RangeSelectionMode _rangeSelectionMode = RangeSelectionMode
-      .toggledOff; //Can be toggled off/on by longpressing a date
 
-  DateTime? _rangeStart;
-  DateTime? _rangeEnd;
+  @override
+  void initState() {
+    super.initState();
+    _selectedDay = DateTime.now();
+    _focusedDay = DateTime.now();
+  }
 
   void _onDaySelected(DateTime selectedDay, DateTime focusedDay) {
     if (!isSameDay(_selectedDay, selectedDay)) {
@@ -26,20 +28,10 @@ class DatePickerState extends State<DatePicker> {
         setState(() {
           _selectedDay = selectedDay;
           _focusedDay = focusedDay;
-          _rangeStart = null;
-          _rangeEnd = null;
-          _rangeSelectionMode = RangeSelectionMode.toggledOff;
         });
       }
       widget.onDateChanged(selectedDay);
     }
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _selectedDay = DateTime.now();
-    _focusedDay = DateTime.now();
   }
 
   @override
@@ -49,39 +41,26 @@ class DatePickerState extends State<DatePicker> {
       lastDay: kLastDay,
       focusedDay: _focusedDay,
       selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
-      rangeStartDay: _rangeStart,
-      rangeEndDay: _rangeEnd,
       calendarFormat: _calendarFormat,
-      rangeSelectionMode: _rangeSelectionMode,
+      availableCalendarFormats: const {
+        CalendarFormat.month: 'Week View',
+        CalendarFormat.week: 'Month View',
+      },
       startingDayOfWeek: StartingDayOfWeek.monday,
       calendarStyle: const CalendarStyle(
         outsideDaysVisible: false,
       ),
       onDaySelected: _onDaySelected,
-      onRangeSelected: _onRangeSelected,
       onFormatChanged: (format) {
         if (_calendarFormat != format) {
-          if (mounted) {
-            setState(() {
-              _calendarFormat = format;
-            });
-          }
+          setState(() {
+            _calendarFormat = format;
+          });
         }
       },
       onPageChanged: (focusedDay) {
         _focusedDay = focusedDay;
       },
     );
-  }
-
-  void _onRangeSelected(DateTime? start, DateTime? end, DateTime focusedDay) {
-    if (mounted) {
-      setState(() {
-        _focusedDay = focusedDay;
-        _rangeStart = start;
-        _rangeEnd = end;
-        _rangeSelectionMode = RangeSelectionMode.toggledOn;
-      });
-    }
   }
 }

@@ -3,10 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:tyman/data/models/task_model.dart';
 import 'package:tyman/data/models/task_data.dart';
-import 'package:tyman/data/services/task_service.dart';
+import 'package:tyman/domain/usecases/task/fetch_tasks_for_today.dart';
 
 class UpcomingTasksPage extends StatefulWidget {
-  const UpcomingTasksPage({super.key});
+  final FetchTasksForToday fetchTasksForToday;
+
+  const UpcomingTasksPage({super.key, required this.fetchTasksForToday});
 
   @override
   UpcomingTasksPageState createState() => UpcomingTasksPageState();
@@ -18,7 +20,7 @@ class UpcomingTasksPageState extends State<UpcomingTasksPage> {
   @override
   void initState() {
     super.initState();
-    _tasksForToday = TaskService().fetchTasksForToday();
+    _tasksForToday = widget.fetchTasksForToday();
   }
 
   @override

@@ -1,16 +1,13 @@
 import 'package:flutter/material.dart';
 
-class TaskTitle extends StatefulWidget {
+class TaskTitle extends StatelessWidget {
+  final String selectedFilter;
   final Function(String) onFilterSelected;
 
-  const TaskTitle({super.key, required this.onFilterSelected});
-
-  @override
-  TaskTitleState createState() => TaskTitleState();
-}
-
-class TaskTitleState extends State<TaskTitle> {
-  String selectedFilter = 'Order By';
+  const TaskTitle(
+      {super.key,
+      required this.onFilterSelected,
+      required this.selectedFilter});
 
   @override
   Widget build(BuildContext context) {
@@ -29,14 +26,7 @@ class TaskTitleState extends State<TaskTitle> {
                 color: Colors.grey.withValues(alpha: 0.30),
                 borderRadius: BorderRadius.circular(25)),
             child: PopupMenuButton<String>(
-              onSelected: (String value) {
-                if (mounted) {
-                  setState(() {
-                    selectedFilter = value;
-                  });
-                }
-                widget.onFilterSelected(value);
-              },
+              onSelected: onFilterSelected,
               itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
                 const PopupMenuItem<String>(
                   value: 'Deadline',

@@ -11,10 +11,12 @@ import 'package:tyman/data/models/task_data.dart';
 import 'package:tyman/data/services/user_service.dart';
 import 'package:tyman/domain/usecases/task/add_task.dart';
 import 'package:tyman/domain/usecases/task/fetch_task_counts_for_categories.dart';
-import 'package:tyman/features/tasks/presentation/widgets/tasks.dart';
+import 'package:tyman/domain/usecases/user/fetch_user_profile.dart';
+import 'package:tyman/domain/usecases/user/update_profile.dart';
+import 'package:tyman/features/tasks/presentation/widgets/task_grid.dart';
 import 'package:tyman/features/profile/presentation/my_page.dart';
 import 'package:tyman/data/models/task_model.dart';
-import 'package:tyman/features/tasks/presentation/widgets/upcoming_tasks.dart';
+import 'package:tyman/features/tasks/presentation/widgets/upcoming_tasks_card.dart';
 
 class HomePage extends StatefulWidget {
   final FetchTaskCountsForCategories fetchTaskCounts;
@@ -99,7 +101,7 @@ class HomePageState extends State<HomePage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const UpcomingTasks(),
+                  const UpcomingTasksCard(),
                   Container(
                     padding: const EdgeInsets.all(15),
                     child: const Text(
@@ -109,7 +111,7 @@ class HomePageState extends State<HomePage> {
                     ),
                   ),
                   Expanded(
-                    child: Tasks(taskCategories: snapshot.data!),
+                    child: TaskGrid(taskCategories: snapshot.data!),
                   ),
                 ],
               ),
@@ -484,9 +486,11 @@ class HomePageState extends State<HomePage> {
             ],
             onTap: (index) {
               if (index == 1) {
-                Navigator.of(context).push(
-                  MaterialPageRoute(builder: (context) => const MyPage()),
-                );
+                Navigator.of(context).push(MaterialPageRoute(
+                  builder: (context) => MyPage(
+                      fetchUserProfile: FetchUserProfile(UserService()),
+                      updateProfile: UpdateProfile(UserService())),
+                ));
               }
             }),
       ),
