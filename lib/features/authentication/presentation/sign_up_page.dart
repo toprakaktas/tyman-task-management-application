@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:tyman/data/services/auth_service.dart';
 import 'dart:math';
 import 'package:tyman/core/constants/colors.dart';
+import 'package:tyman/domain/usecases/auth/sign_up.dart';
 
 class SignUpPage extends StatefulWidget {
   final VoidCallback show;
-  const SignUpPage(this.show, {super.key});
+  final SignUp signUp;
+  const SignUpPage(this.show, {super.key, required this.signUp});
 
   @override
   SignUpPageState createState() => SignUpPageState();
@@ -126,11 +127,8 @@ class SignUpPageState extends State<SignUpPage> {
       padding: const EdgeInsets.symmetric(horizontal: 100),
       child: GestureDetector(
         onTap: () {
-          AuthService().signUp(
-              email: email.text,
-              password: password.text,
-              passwordConfirm: passwordConfirm.text,
-              context: context);
+          widget.signUp(
+              email.text, password.text, passwordConfirm.text, context);
         },
         child: Container(
           alignment: Alignment.center,

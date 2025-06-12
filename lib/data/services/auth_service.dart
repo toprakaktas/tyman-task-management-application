@@ -1,15 +1,14 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:tyman/domain/services/auth_repository.dart';
 
-class AuthService {
+class AuthService implements AuthRepository {
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
 //TODO: Fix// user won't added to the firebase database
-  Future<void> signUp(
-      {required String email,
-      required String password,
-      required String passwordConfirm,
-      required BuildContext context}) async {
+  @override
+  Future<void> signUp(String email, String password, String passwordConfirm,
+      BuildContext context) async {
     if (email.isEmpty || password.isEmpty || passwordConfirm.isEmpty) {
       _showMessage(context, 'Please fill in all fields.');
       return;
@@ -31,10 +30,9 @@ class AuthService {
     }
   }
 
+  @override
   Future<void> logIn(
-      {required String email,
-      required String password,
-      required BuildContext context}) async {
+      String email, String password, BuildContext context) async {
     if (email.isEmpty || password.isEmpty) {
       _showMessage(context, 'Please fill in all fields.');
       return;
@@ -47,7 +45,8 @@ class AuthService {
     }
   }
 
-  Future<void> logout(BuildContext context) async {
+  @override
+  Future<void> logOut(BuildContext context) async {
     try {
       await _auth.signOut();
       _showMessage(context, 'Successfully logged out!');

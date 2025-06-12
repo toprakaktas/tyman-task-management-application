@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:tyman/data/services/auth_service.dart';
 import 'dart:math';
 import 'package:tyman/core/constants/colors.dart';
+import 'package:tyman/domain/usecases/auth/log_in.dart';
 
 class LoginPage extends StatefulWidget {
   final VoidCallback show;
+  final LogIn logIn;
 
-  const LoginPage(this.show, {super.key});
+  const LoginPage(this.show, {super.key, required this.logIn});
 
   @override
   LoginPageState createState() => LoginPageState();
@@ -121,8 +122,7 @@ class LoginPageState extends State<LoginPage> {
       padding: const EdgeInsets.symmetric(horizontal: 100),
       child: GestureDetector(
         onTap: () {
-          AuthService().logIn(
-              email: email.text, password: password.text, context: context);
+          widget.logIn(email.text, password.text, context);
         },
         child: Container(
           alignment: Alignment.center,
