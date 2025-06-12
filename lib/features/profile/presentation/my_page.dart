@@ -103,7 +103,7 @@ class MyPageState extends State<MyPage> {
 
   Future<void> logout(BuildContext context) async {
     try {
-      await authService.logout(context);
+      await authService.logOut(context);
     } catch (e) {
       const snackBar = SnackBar(content: Text('Error signing out. Try again.'));
       if (context.mounted) {
