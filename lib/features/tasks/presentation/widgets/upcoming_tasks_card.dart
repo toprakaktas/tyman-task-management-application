@@ -59,7 +59,8 @@ class UpcomingTasksCard extends StatelessWidget {
           ),
           Positioned(
             bottom: 27,
-            right: 10,
+            top: 27,
+            right: 50,
             child: const Icon(
               Icons.arrow_forward_ios_rounded,
               color: Colors.white,
