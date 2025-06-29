@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:tyman/core/constants/colors.dart';
+import 'package:tyman/core/widgets/task_card.dart';
 import 'package:tyman/data/models/task_data.dart';
 import 'package:tyman/data/services/task_service.dart';
 import 'package:tyman/domain/usecases/task/add_task.dart';
@@ -550,36 +551,12 @@ class _DetailPageState extends State<DetailPage> {
                 delegate: SliverChildBuilderDelegate(
                   (_, index) {
                     TaskData task = snapshot.data![index];
-                    return Card(
-                      margin: const EdgeInsets.symmetric(
-                          vertical: 3, horizontal: 1),
-                      color: task.completed
-                          ? markedTaskColor
-                          : CupertinoColors.systemGrey5,
-                      child: ListTile(
-                        leading: IconButton(
-                          onPressed: () => markTaskAsDone(task),
-                          icon: const Icon(CupertinoIcons.check_mark_circled,
-                              color: completeTaskColor),
-                        ),
-                        title: Text(task.description,
-                            style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                            )),
-                        subtitle:
-                            Text('Due Time: ${formatDate(task.dueDateTime)}'),
-                        trailing: Wrap(spacing: 5, children: <Widget>[
-                          IconButton(
-                              onPressed: () => editTask(task),
-                              icon: const Icon(CupertinoIcons.pen)),
-                          IconButton(
-                              onPressed: () => deleteTask(task),
-                              icon: const Icon(
-                                CupertinoIcons.trash,
-                                color: Color(0xFFF74F43),
-                              )),
-                        ]),
-                      ),
+                    return TaskCard(
+                      task: task,
+                      interactive: true,
+                      onEdit: () => editTask(task),
+                      onDelete: () => deleteTask(task),
+                      onMarkDone: () => markTaskAsDone(task),
                     );
                   },
                   childCount: snapshot.data!.length,
