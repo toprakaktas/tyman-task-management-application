@@ -24,33 +24,33 @@ class TaskModel {
       : this(
             title: 'Personal',
             iconData: Icons.person,
-            bgColor: kYellowLight,
-            iconColor: kYellowDark,
-            btnColor: kYellow);
+            bgColor: cardYellowLight,
+            iconColor: cardYellowDark,
+            btnColor: cardYellow);
 
   TaskModel.work()
       : this(
             title: 'Work',
             iconData: Icons.cases_rounded,
-            bgColor: kRedLight,
+            bgColor: cardRedLight,
             iconColor: kRedDark,
-            btnColor: kRed);
+            btnColor: cardRed);
 
   TaskModel.health()
       : this(
             title: 'Health',
             iconData: Icons.favorite_rounded,
-            bgColor: kBlueLight,
-            iconColor: kBlueDark,
-            btnColor: kBlue);
+            bgColor: cardBlueLight,
+            iconColor: cardBlueDark,
+            btnColor: cardBlue);
 
   TaskModel.other()
       : this(
             title: 'Other',
             iconData: Icons.app_registration_rounded,
             bgColor: Colors.grey,
-            iconColor: kGrey,
-            btnColor: kGreyLight);
+            iconColor: designGrey,
+            btnColor: designGreyLight);
 
   static TaskModel fromTitle(String title) {
     switch (title) {
