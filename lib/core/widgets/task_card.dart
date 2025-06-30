@@ -31,12 +31,12 @@ class TaskCard extends StatelessWidget {
     Color cardColor() {
       if (task.completed == true && interactive) {
         return markedTaskColor;
-      } else if (task.completed == false && !interactive) {
+      } else if (task.completed == true && !interactive) {
         return model.bgColor;
-      } else if (task.completed == true && interactive) {
-        return Colors.grey.shade200;
-      } else {
+      } else if (task.completed == false && interactive) {
         return CupertinoColors.systemGrey5;
+      } else {
+        return model.btnColor;
       }
     }
 
@@ -63,8 +63,8 @@ class TaskCard extends StatelessWidget {
           title: Text(
             task.description,
             style: TextStyle(
-              fontWeight: FontWeight.bold,
-              color: task.completed ? Colors.grey.shade600 : Colors.black,
+              fontWeight: FontWeight.w600,
+              color: task.completed ? Colors.grey.shade600 : Colors.black87,
               fontSize: 16.5,
             ),
           ),
@@ -78,7 +78,7 @@ class TaskCard extends StatelessWidget {
             ),
           ),
           trailing: interactive
-              ? Wrap(spacing: 3, children: [
+              ? Wrap(spacing: 0.5, children: [
                   IconButton(
                     icon: const Icon(CupertinoIcons.pen),
                     onPressed: onEdit,
@@ -95,8 +95,9 @@ class TaskCard extends StatelessWidget {
                   task.completed
                       ? Icons.check_circle
                       : Icons.schedule, // or CupertinoIcons
-                  color: task.completed ? Colors.green : Colors.redAccent,
-                ),
+                  color: task.completed
+                      ? CupertinoColors.activeGreen
+                      : Colors.redAccent),
         ));
   }
 }
