@@ -1,23 +1,26 @@
 import 'package:flutter/material.dart';
 
-const Color kYellowLight = Color(0xFFFFF7EC);
-const Color kYellow = Color(0xFFFAF0DA);
-const Color kYellowDark = Color(0xFFEBBB7F);
+const Color cardYellowLight = Color(0xFFFFF7EC);
+const Color cardYellow = Color(0xFFFAF0DA);
+const Color cardYellowDark = Color(0xFFEBBB7F);
 
-const Color kRedLight = Color(0xFFFCF0F0);
-const Color kRed = Color(0xFFFBE4E6);
+const Color cardRedLight = Color(0xFFFCF0F0);
+const Color cardRed = Color(0xFFFBE4E6);
 const Color kRedDark = Color(0xFFF08A8E);
 
-const Color kBlueLight = Color(0xFFEDF4FE);
-const Color kBlue = Color(0xFFE1EDFC);
-const Color kBlueDark = Color(0xFFC0D3F8);
+const Color cardBlueLight = Color(0xFFEDF4FE);
+const Color cardBlue = Color(0xFFE1EDFC);
+const Color cardBlueDark = Color(0xFFC0D3F8);
 
-const Color kBlack = Color(0x85000000);
-const Color kGreyDark = Color(0xFF343535);
-const Color kGrey = Color(0xFF4C4B4F);
-const Color kGreyLight = Color(0xFF7B7B7B);
-const Color kWhiteGrey = Color(0xFF999595);
+const Color designBlack = Color(0x85000000);
+const Color designGreyDark = Color(0xFF343535);
+const Color designGrey = Color(0xFF4C4B4F);
+const Color designGreyLight = Color(0xFF7B7B7B);
+const Color designWhiteGrey = Color(0xFF999595);
 
 const Color taskColor = Color(0xFF3D7BB4);
 const Color completeTaskColor = Color(0xCE29813A);
-const Color markedTaskColor = Color(0xDF6BE387);
+const Color markedTaskColor = Color(0xDF9EE1AD);
+const Color deleteTaskColor = Color(0xFFF74F43);
+
+//TODO: Add task title colors

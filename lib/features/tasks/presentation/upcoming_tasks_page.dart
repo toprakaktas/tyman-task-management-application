@@ -1,7 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
-import 'package:tyman/data/models/task_model.dart';
+import 'package:tyman/core/widgets/task_card.dart';
 import 'package:tyman/data/models/task_data.dart';
 import 'package:tyman/domain/usecases/task/fetch_tasks_for_today.dart';
 
@@ -11,16 +10,16 @@ class UpcomingTasksPage extends StatefulWidget {
   const UpcomingTasksPage({super.key, required this.fetchTasksForToday});
 
   @override
-  UpcomingTasksPageState createState() => UpcomingTasksPageState();
+  State<UpcomingTasksPage> createState() => _UpcomingTasksPageState();
 }
 
-class UpcomingTasksPageState extends State<UpcomingTasksPage> {
-  late Future<List<TaskData>> _tasksForToday;
+class _UpcomingTasksPageState extends State<UpcomingTasksPage> {
+  late Future<List<TaskData>> tasksFuture;
 
   @override
   void initState() {
     super.initState();
-    _tasksForToday = widget.fetchTasksForToday();
+    tasksFuture = widget.fetchTasksForToday();
   }
 
   @override
@@ -38,63 +37,30 @@ class UpcomingTasksPageState extends State<UpcomingTasksPage> {
           },
         ),
       ),
-      body: FutureBuilder<List<TaskData>>(
-        future: _tasksForToday,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          }
-          if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
-          }
-          if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return const Center(child: Text('No tasks for today!'));
-          }
+      body: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 12.0),
+        child: FutureBuilder<List<TaskData>>(
+          future: tasksFuture,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(child: CircularProgressIndicator());
+            }
+            if (snapshot.hasError) {
+              return Center(child: Text('Error: ${snapshot.error}'));
+            }
+            if (!snapshot.hasData || snapshot.data!.isEmpty) {
+              return const Center(child: Text('No tasks for today!'));
+            }
 
-          return ListView.builder(
-            itemCount: snapshot.data!.length,
-            itemBuilder: (context, index) {
-              final task = snapshot.data![index];
-              final TaskModel taskModel = TaskModel.fromTitle(task.category);
-              return Card(
-                margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-                color: taskModel.bgColor,
-                child: ListTile(
-                  leading: Icon(
-                    task.category == taskModel.title
-                        ? taskModel.iconData
-                        : Icons.error,
-                    color: taskModel.iconColor,
-                  ),
-                  title: Text(
-                    task.description,
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: task.completed
-                            ? Colors.grey.shade600
-                            : Colors.black,
-                        fontSize: 17),
-                  ),
-                  subtitle: Text(
-                    '${task.category} • ${DateFormat('dd/MM/yy').format(task.dueDateTime)} • ${task.dueDateTime.hour}:${task.dueDateTime.minute}',
-                    style: TextStyle(
-                      color:
-                          task.completed ? Colors.grey.shade600 : Colors.black,
-                    ),
-                  ),
-                  trailing: Icon(
-                    task.completed
-                        ? CupertinoIcons.checkmark_circle
-                        : CupertinoIcons.time,
-                    color: task.completed
-                        ? CupertinoColors.activeGreen
-                        : Colors.red,
-                  ),
-                ),
-              );
-            },
-          );
-        },
+            return ListView.builder(
+              itemCount: snapshot.data!.length,
+              itemBuilder: (_, index) {
+                final task = snapshot.data![index];
+                return TaskCard(task: task);
+              },
+            );
+          },
+        ),
       ),
     );
   }
