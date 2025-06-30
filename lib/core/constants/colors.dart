@@ -20,5 +20,7 @@ const Color designWhiteGrey = Color(0xFF999595);
 
 const Color taskColor = Color(0xFF3D7BB4);
 const Color completeTaskColor = Color(0xCE29813A);
-const Color markedTaskColor = Color(0xDF6BE387);
+const Color markedTaskColor = Color(0xDF9EE1AD);
 const Color deleteTaskColor = Color(0xFFF74F43);
+
+//TODO: Add task title colors
