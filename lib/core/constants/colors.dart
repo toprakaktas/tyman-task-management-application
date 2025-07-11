@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 
 const Color cardYellowLight = Color(0xFFFFF7EC);
 const Color cardYellow = Color(0xFFFAF0DA);
@@ -22,5 +22,10 @@ const Color taskColor = Color(0xFF3D7BB4);
 const Color completeTaskColor = Color(0xCE29813A);
 const Color markedTaskColor = Color(0xDF9EE1AD);
 const Color deleteTaskColor = Color(0xFFF74F43);
+
+const detailTaskBGColor = CupertinoColors.systemGrey5;
+
+const upcomingIconColorActive = CupertinoColors.activeGreen;
+const upcomingIconColorInactive = Color(0xFFFF5252);
 
 //TODO: Add task title colors
