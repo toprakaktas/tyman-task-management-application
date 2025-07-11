@@ -110,7 +110,7 @@ class SignUpPageState extends State<SignUpPage> {
           GestureDetector(
             onTap: widget.show,
             child: const Text(
-              'Login',
+              'Sign In',
               style: TextStyle(
                   color: Color(0xFF2D2D2D),
                   fontSize: 14,
