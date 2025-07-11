@@ -8,7 +8,9 @@ import 'package:intl/intl.dart';
 import 'package:tyman/core/constants/colors.dart';
 import 'package:tyman/data/models/app_user.dart';
 import 'package:tyman/data/models/task_data.dart';
+import 'package:tyman/data/services/auth_service.dart';
 import 'package:tyman/data/services/user_service.dart';
+import 'package:tyman/domain/usecases/auth/sign_out.dart';
 import 'package:tyman/domain/usecases/task/add_task.dart';
 import 'package:tyman/domain/usecases/task/fetch_task_counts_for_categories.dart';
 import 'package:tyman/domain/usecases/user/fetch_user_profile.dart';
@@ -488,6 +490,7 @@ class HomePageState extends State<HomePage> {
               if (index == 1) {
                 Navigator.of(context).push(MaterialPageRoute(
                   builder: (context) => MyPage(
+                      signOut: SignOut(AuthService()),
                       fetchUserProfile: FetchUserProfile(UserService()),
                       updateProfile: UpdateProfile(UserService())),
                 ));
