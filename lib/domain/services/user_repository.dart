@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:tyman/data/models/app_user.dart';
 
 abstract class UserRepository {
@@ -5,4 +6,5 @@ abstract class UserRepository {
   Future<AppUser?> fetchUserProfile(String uid);
   Future<void> updateProfile(
       AppUser appUser, String name, String email, String photo);
+  Future<String> uploadProfileImage(File file);
 }

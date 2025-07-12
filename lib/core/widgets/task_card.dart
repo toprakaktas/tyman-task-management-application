@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:tyman/core/constants/colors.dart';
+import 'package:tyman/core/widgets/task_card_style.dart';
 import 'package:tyman/data/models/task_data.dart';
 import 'package:tyman/data/models/task_model.dart';
 
@@ -22,30 +23,21 @@ class TaskCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    //TODO: improve TaskModel usage.
     final TaskModel model = TaskModel.fromTitle(task.category);
+    final style =
+        TaskCardStyle(task: task, model: model, interactive: interactive);
 
     final screenWidth = MediaQuery.of(context).size.width;
     final marginH = screenWidth * 0.04;
     final marginV = marginH / 4;
-
-    Color cardColor() {
-      if (task.completed == true && interactive) {
-        return markedTaskColor;
-      } else if (task.completed == true && !interactive) {
-        return model.bgColor;
-      } else if (task.completed == false && interactive) {
-        return CupertinoColors.systemGrey5;
-      } else {
-        return model.btnColor;
-      }
-    }
 
 //TODO: interactive & completed bg colors needs fix
     return Card(
         elevation: 0.75,
         margin:
             EdgeInsets.symmetric(horizontal: marginH * 0.15, vertical: marginV),
-        color: cardColor.call(),
+        color: style.backgroundColor,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         child: ListTile(
           contentPadding:
@@ -53,9 +45,7 @@ class TaskCard extends StatelessWidget {
           leading: interactive
               ? IconButton(
                   icon: Icon(
-                    task.completed
-                        ? CupertinoIcons.check_mark_circled_solid
-                        : CupertinoIcons.circle,
+                    style.toggleIcon,
                     color: completeTaskColor,
                   ),
                   onPressed: onMarkDone)
@@ -64,7 +54,7 @@ class TaskCard extends StatelessWidget {
             task.description,
             style: TextStyle(
               fontWeight: FontWeight.w600,
-              color: task.completed ? Colors.grey.shade600 : Colors.black87,
+              color: style.titleColor,
               fontSize: 16.5,
             ),
           ),
@@ -73,7 +63,7 @@ class TaskCard extends StatelessWidget {
             '${task.dueDateTime.hour.toString().padLeft(2, '0')}:'
             '${task.dueDateTime.minute.toString().padLeft(2, '0')}',
             style: TextStyle(
-              color: task.completed ? Colors.grey.shade600 : Colors.black,
+              color: style.subtitleColor,
               fontSize: 14,
             ),
           ),
@@ -91,13 +81,8 @@ class TaskCard extends StatelessWidget {
                     onPressed: onDelete,
                   ),
                 ])
-              : Icon(
-                  task.completed
-                      ? Icons.check_circle
-                      : Icons.schedule, // or CupertinoIcons
-                  color: task.completed
-                      ? CupertinoColors.activeGreen
-                      : Colors.redAccent),
+              : Icon(style.statusIcon, // or CupertinoIcons
+                  color: style.statusIconColor),
         ));
   }
 }

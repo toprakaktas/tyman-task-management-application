@@ -1,19 +1,19 @@
 import 'package:flutter/material.dart';
 import 'dart:math';
 import 'package:tyman/core/constants/colors.dart';
-import 'package:tyman/domain/usecases/auth/log_in.dart';
+import 'package:tyman/domain/usecases/auth/sign_in.dart';
 
-class LoginPage extends StatefulWidget {
+class SignInPage extends StatefulWidget {
   final VoidCallback show;
-  final LogIn logIn;
+  final SignIn signIn;
 
-  const LoginPage(this.show, {super.key, required this.logIn});
+  const SignInPage(this.show, {super.key, required this.signIn});
 
   @override
-  LoginPageState createState() => LoginPageState();
+  SignInPageState createState() => SignInPageState();
 }
 
-class LoginPageState extends State<LoginPage> {
+class SignInPageState extends State<SignInPage> {
   FocusNode focusNode1 = FocusNode();
   FocusNode focusNode2 = FocusNode();
 
@@ -122,7 +122,7 @@ class LoginPageState extends State<LoginPage> {
       padding: const EdgeInsets.symmetric(horizontal: 100),
       child: GestureDetector(
         onTap: () {
-          widget.logIn(email.text, password.text, context);
+          widget.signIn(email.text, password.text, context);
         },
         child: Container(
           alignment: Alignment.center,
@@ -132,7 +132,7 @@ class LoginPageState extends State<LoginPage> {
               color: const Color(0xFF3E3E3E),
               borderRadius: BorderRadius.circular(10)),
           child: const Text(
-            'Login',
+            'Sign In',
             style: TextStyle(
               color: Color(0xFFAEAEAE),
               fontSize: 18.5,

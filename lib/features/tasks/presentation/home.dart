@@ -6,13 +6,17 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:tyman/core/constants/colors.dart';
+import 'package:tyman/core/utils/snackbar_helper.dart';
 import 'package:tyman/data/models/app_user.dart';
 import 'package:tyman/data/models/task_data.dart';
+import 'package:tyman/data/services/auth_service.dart';
 import 'package:tyman/data/services/user_service.dart';
+import 'package:tyman/domain/usecases/auth/sign_out.dart';
 import 'package:tyman/domain/usecases/task/add_task.dart';
 import 'package:tyman/domain/usecases/task/fetch_task_counts_for_categories.dart';
 import 'package:tyman/domain/usecases/user/fetch_user_profile.dart';
 import 'package:tyman/domain/usecases/user/update_profile.dart';
+import 'package:tyman/domain/usecases/user/upload_profile_image.dart';
 import 'package:tyman/features/tasks/presentation/widgets/task_grid.dart';
 import 'package:tyman/features/profile/presentation/my_page.dart';
 import 'package:tyman/data/models/task_model.dart';
@@ -58,26 +62,13 @@ class HomePageState extends State<HomePage> {
     }
   }
 
-  void _showSnackBar(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: Colors.green,
-        behavior: SnackBarBehavior.floating,
-      ),
-    );
-  }
-
   ImageProvider _getImageProvider(String photoUrl) {
-    if (photoUrl.startsWith('assets/images')) {
+    if (photoUrl.startsWith('http')) {
+      return NetworkImage(photoUrl);
+    } else if (photoUrl.startsWith('assets/')) {
       return AssetImage(photoUrl);
     } else {
-      File file = File(photoUrl);
-      if (file.existsSync() && file.lengthSync() > 0) {
-        return FileImage(file);
-      } else {
-        return const AssetImage('assets/images/userAvatar.png');
-      }
+      return FileImage(File(photoUrl));
     }
   }
 
@@ -389,7 +380,7 @@ class HomePageState extends State<HomePage> {
                         if (context.mounted) {
                           Navigator.of(context).pop();
                           _refreshData();
-                          _showSnackBar('Task successfully added!');
+                          showSnackBar(context, 'Task successfully added!');
                         }
                       });
                     },
@@ -486,8 +477,10 @@ class HomePageState extends State<HomePage> {
             ],
             onTap: (index) {
               if (index == 1) {
-                Navigator.of(context).push(MaterialPageRoute(
+                Navigator.of(context).pushReplacement(MaterialPageRoute(
                   builder: (context) => MyPage(
+                      uploadProfileImage: UploadProfileImage(UserService()),
+                      signOut: SignOut(AuthService()),
                       fetchUserProfile: FetchUserProfile(UserService()),
                       updateProfile: UpdateProfile(UserService())),
                 ));
