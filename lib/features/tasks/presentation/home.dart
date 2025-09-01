@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:tyman/core/constants/colors.dart';
 import 'package:tyman/core/utils/snackbar_helper.dart';
+import 'package:tyman/core/widgets/app_bottom_nav_bar.dart';
 import 'package:tyman/data/models/app_user.dart';
 import 'package:tyman/data/models/task_data.dart';
 import 'package:tyman/data/services/auth_service.dart';
@@ -110,7 +111,19 @@ class HomePageState extends State<HomePage> {
           }
         },
       ),
-      bottomNavigationBar: buildBottomNavBar(context),
+      bottomNavigationBar: AppBottomNavBar(
+          currentIndex: 0,
+          onTap: (index) {
+            if (index == 1) {
+              Navigator.of(context).pushReplacement(MaterialPageRoute(
+                builder: (context) => MyPage(
+                    uploadProfileImage: UploadProfileImage(UserService()),
+                    signOut: SignOut(AuthService()),
+                    fetchUserProfile: FetchUserProfile(UserService()),
+                    updateProfile: UpdateProfile(UserService())),
+              ));
+            }
+          }),
       floatingActionButtonLocation:
           FloatingActionButtonLocation.miniCenterDocked,
       floatingActionButton: buildFloatingButton(context),
@@ -435,57 +448,6 @@ class HomePageState extends State<HomePage> {
             ),
           )
         ],
-      ),
-    );
-  }
-
-  Widget buildBottomNavBar(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: const BorderRadius.only(
-          topLeft: Radius.circular(30),
-          topRight: Radius.circular(30),
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withValues(alpha: 0.2),
-            spreadRadius: 5,
-            blurRadius: 10,
-          ),
-        ],
-      ),
-      child: ClipRRect(
-        borderRadius: const BorderRadius.only(
-          topLeft: Radius.circular(30),
-          topRight: Radius.circular(30),
-        ),
-        child: BottomNavigationBar(
-            backgroundColor: Colors.white,
-            showSelectedLabels: true,
-            showUnselectedLabels: true,
-            selectedItemColor: const Color.fromARGB(255, 63, 117, 212),
-            unselectedItemColor: Colors.grey.withValues(alpha: 0.75),
-            items: const [
-              BottomNavigationBarItem(
-                label: 'Home',
-                icon: Icon(Icons.home_rounded),
-              ),
-              BottomNavigationBarItem(
-                label: 'My Page',
-                icon: Icon(Icons.person_rounded),
-              ),
-            ],
-            onTap: (index) {
-              if (index == 1) {
-                Navigator.of(context).pushReplacement(MaterialPageRoute(
-                  builder: (context) => MyPage(
-                      uploadProfileImage: UploadProfileImage(UserService()),
-                      signOut: SignOut(AuthService()),
-                      fetchUserProfile: FetchUserProfile(UserService()),
-                      updateProfile: UpdateProfile(UserService())),
-                ));
-              }
-            }),
       ),
     );
   }

@@ -3,6 +3,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:tyman/core/utils/snackbar_helper.dart';
+import 'package:tyman/core/widgets/app_bottom_nav_bar.dart';
+import 'package:tyman/core/widgets/custom_text_field.dart';
 import 'package:tyman/data/services/auth_service.dart';
 import 'package:tyman/data/services/task_service.dart';
 import 'dart:io';
@@ -103,9 +106,11 @@ class MyPageState extends State<MyPage> {
         emailController.text,
         downloadUrl,
       );
-      _showSnackBar('Profile picture updated successfully');
+      if (mounted) {
+        showSnackBar(context, 'Profile picture updated successfully');
+      }
     } catch (e) {
-      _showSnackBar('Upload failed: $e');
+      if (mounted) showSnackBar(context, 'Upload failed: $e');
       return;
     }
   }
@@ -119,21 +124,21 @@ class MyPageState extends State<MyPage> {
         appUser!.photo,
       );
       if (mounted) {
-        _showSnackBar('Profile updated successfully');
+        showSnackBar(context, 'Profile updated successfully');
       }
     } catch (e) {
       if (mounted) {
-        _showSnackBar('Error updating profile: $e');
+        showSnackBar(context, 'Error updating profile: $e');
       }
     }
   }
 
-  Future<void> signOut(BuildContext context) async {
+  Future<void> _signOut(BuildContext context) async {
     try {
       await widget.signOut(context);
     } catch (e) {
       if (context.mounted) {
-        _showSnackBar('Error signing out. Try again.');
+        showSnackBar(context, 'Error signing out. Try again.');
       }
     }
   }
@@ -145,14 +150,6 @@ class MyPageState extends State<MyPage> {
       return AssetImage(photoUrl);
     } else {
       return FileImage(File(photoUrl));
-    }
-  }
-
-  void _showSnackBar(String message) {
-    if (context.mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(message)),
-      );
     }
   }
 
@@ -187,7 +184,17 @@ class MyPageState extends State<MyPage> {
           centerTitle: true,
         ),
         body: _buildProfileContent(),
-        bottomNavigationBar: _buildBottomNavBar(context),
+        bottomNavigationBar: AppBottomNavBar(
+            currentIndex: 1,
+            onTap: (index) {
+              if (index == 0) {
+                Navigator.of(context).pushReplacement(MaterialPageRoute(
+                    builder: (context) => HomePage(
+                        fetchTaskCounts:
+                            FetchTaskCountsForCategories(TaskService()),
+                        addTask: AddTask(TaskService()))));
+              }
+            }),
       ),
     );
   }
@@ -225,9 +232,11 @@ class MyPageState extends State<MyPage> {
               ),
             ),
             const SizedBox(height: 20),
-            _buildTextField(nameController, 'Name', enabled: true),
+            CustomTextField(
+                controller: nameController, label: 'Name', enabled: true),
             const SizedBox(height: 20),
-            _buildTextField(emailController, 'Email', enabled: false),
+            CustomTextField(
+                controller: emailController, label: 'Email', enabled: false),
             const SizedBox(height: 20),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -238,91 +247,13 @@ class MyPageState extends State<MyPage> {
                   child: const Text('Update Profile'),
                 ),
                 CupertinoButton(
-                  onPressed: () => signOut(context),
+                  onPressed: () => _signOut(context),
                   color: CupertinoColors.darkBackgroundGray,
                   child: const Text('Sign Out'),
                 ),
               ],
             ),
           ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildTextField(TextEditingController controller, String label,
-      {required bool enabled}) {
-    return CupertinoTextField(
-      controller: controller,
-      enabled: enabled,
-      readOnly: !enabled,
-      placeholder: label,
-      placeholderStyle: const TextStyle(
-        color: CupertinoColors.inactiveGray,
-        fontStyle: FontStyle.italic,
-      ),
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
-      style: const TextStyle(color: Colors.black, fontSize: 18),
-      decoration: BoxDecoration(
-        color: CupertinoColors.systemGrey5,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: CupertinoColors.systemGrey,
-          width: 1,
-        ),
-      ),
-    );
-  }
-
-  Widget _buildBottomNavBar(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: const BorderRadius.only(
-          topLeft: Radius.circular(30),
-          topRight: Radius.circular(30),
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withValues(alpha: 0.2),
-            spreadRadius: 5,
-            blurRadius: 10,
-          ),
-        ],
-      ),
-      child: ClipRRect(
-        borderRadius: const BorderRadius.only(
-          topLeft: Radius.circular(30),
-          topRight: Radius.circular(30),
-        ),
-        child: BottomNavigationBar(
-          backgroundColor: Colors.white,
-          showSelectedLabels: true,
-          showUnselectedLabels: true,
-          selectedItemColor: const Color.fromARGB(255, 63, 117, 212),
-          unselectedItemColor: Colors.grey.withValues(alpha: 0.75),
-          currentIndex: 1,
-          items: const [
-            BottomNavigationBarItem(
-              label: 'Home',
-              icon: Icon(Icons.home_rounded),
-            ),
-            BottomNavigationBarItem(
-              label: 'My Page',
-              icon: Icon(Icons.person_rounded),
-            ),
-          ],
-          onTap: (index) {
-            if (index == 0) {
-              Navigator.of(context).pushReplacement(
-                MaterialPageRoute(
-                    builder: (context) => HomePage(
-                          fetchTaskCounts:
-                              FetchTaskCountsForCategories(TaskService()),
-                          addTask: AddTask(TaskService()),
-                        )),
-              );
-            }
-          },
         ),
       ),
     );
