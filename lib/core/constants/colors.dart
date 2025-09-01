@@ -28,4 +28,8 @@ const detailTaskBGColor = CupertinoColors.systemGrey5;
 const upcomingIconColorActive = CupertinoColors.activeGreen;
 const upcomingIconColorInactive = Color(0xFFFF5252);
 
+const selectedItemColor = Color(0xFF3F75D4);
+const unselectedItemColor = Color(0xFF999999);
+const boxShadowColor = Color(0x339E9E9E);
+
 //TODO: Add task title colors
