@@ -10,6 +10,7 @@ import 'package:tyman/data/services/auth_service.dart';
 import 'package:tyman/data/services/task_service.dart';
 import 'dart:io';
 import 'package:tyman/core/constants/colors.dart';
+import 'package:tyman/data/services/user_service.dart';
 import 'package:tyman/domain/usecases/auth/sign_in.dart';
 import 'package:tyman/domain/usecases/auth/sign_out.dart';
 import 'package:tyman/domain/usecases/task/add_task.dart';
@@ -192,7 +193,8 @@ class MyPageState extends State<MyPage> {
                     builder: (context) => HomePage(
                         fetchTaskCounts:
                             FetchTaskCountsForCategories(TaskService()),
-                        addTask: AddTask(TaskService()))));
+                        addTask: AddTask(TaskService()),
+                        fetchUserProfile: FetchUserProfile(UserService()))));
               }
             }),
       ),

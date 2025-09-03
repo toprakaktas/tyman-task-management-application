@@ -7,11 +7,13 @@ import 'package:tyman/core/constants/colors.dart';
 import 'package:tyman/core/widgets/task_card.dart';
 import 'package:tyman/data/models/task_data.dart';
 import 'package:tyman/data/services/task_service.dart';
+import 'package:tyman/data/services/user_service.dart';
 import 'package:tyman/domain/usecases/task/add_task.dart';
 import 'package:tyman/domain/usecases/task/delete_task.dart';
 import 'package:tyman/domain/usecases/task/fetch_task_counts_for_categories.dart';
 import 'package:tyman/domain/usecases/task/fetch_tasks_by_category_and_date.dart';
 import 'package:tyman/domain/usecases/task/update_task.dart';
+import 'package:tyman/domain/usecases/user/fetch_user_profile.dart';
 import 'package:tyman/features/tasks/presentation/widgets/date_picker.dart';
 import 'package:tyman/features/tasks/presentation/home.dart';
 import 'package:tyman/features/tasks/presentation/widgets/task_title.dart';
@@ -589,7 +591,8 @@ class _DetailPageState extends State<DetailPage> {
         onPressed: () => Navigator.of(context).push(MaterialPageRoute(
             builder: (context) => HomePage(
                 fetchTaskCounts: FetchTaskCountsForCategories(TaskService()),
-                addTask: AddTask(TaskService())))),
+                addTask: AddTask(TaskService()),
+                fetchUserProfile: FetchUserProfile(UserService())))),
         icon: const Icon(Icons.arrow_back_ios_new_rounded),
         iconSize: 20,
       ),
