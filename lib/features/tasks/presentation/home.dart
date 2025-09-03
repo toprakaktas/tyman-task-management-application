@@ -1,15 +1,7 @@
-import 'dart:async';
-import 'dart:io';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
-import 'package:tyman/core/constants/colors.dart';
-import 'package:tyman/core/utils/snackbar_helper.dart';
 import 'package:tyman/core/widgets/app_bottom_nav_bar.dart';
 import 'package:tyman/data/models/app_user.dart';
-import 'package:tyman/data/models/task_data.dart';
 import 'package:tyman/data/services/auth_service.dart';
 import 'package:tyman/data/services/user_service.dart';
 import 'package:tyman/domain/usecases/auth/sign_out.dart';
@@ -18,6 +10,8 @@ import 'package:tyman/domain/usecases/task/fetch_task_counts_for_categories.dart
 import 'package:tyman/domain/usecases/user/fetch_user_profile.dart';
 import 'package:tyman/domain/usecases/user/update_profile.dart';
 import 'package:tyman/domain/usecases/user/upload_profile_image.dart';
+import 'package:tyman/features/tasks/presentation/widgets/add_task_dialog.dart';
+import 'package:tyman/features/tasks/presentation/widgets/home_app_bar.dart';
 import 'package:tyman/features/tasks/presentation/widgets/task_grid.dart';
 import 'package:tyman/features/profile/presentation/my_page.dart';
 import 'package:tyman/data/models/task_model.dart';
@@ -26,9 +20,13 @@ import 'package:tyman/features/tasks/presentation/widgets/upcoming_tasks_card.da
 class HomePage extends StatefulWidget {
   final FetchTaskCountsForCategories fetchTaskCounts;
   final AddTask addTask;
+  final FetchUserProfile fetchUserProfile;
 
   const HomePage(
-      {super.key, required this.fetchTaskCounts, required this.addTask});
+      {super.key,
+      required this.fetchTaskCounts,
+      required this.addTask,
+      required this.fetchUserProfile});
 
   @override
   HomePageState createState() => HomePageState();
@@ -48,7 +46,7 @@ class HomePageState extends State<HomePage> {
   Future<void> fetchUserData() async {
     User? firebaseUser = FirebaseAuth.instance.currentUser;
     if (firebaseUser != null) {
-      appUser = await UserService().fetchUserProfile(firebaseUser.uid);
+      appUser = await widget.fetchUserProfile(firebaseUser.uid);
       if (mounted) {
         setState(() {});
       }
@@ -63,21 +61,11 @@ class HomePageState extends State<HomePage> {
     }
   }
 
-  ImageProvider _getImageProvider(String photoUrl) {
-    if (photoUrl.startsWith('http')) {
-      return NetworkImage(photoUrl);
-    } else if (photoUrl.startsWith('assets/')) {
-      return AssetImage(photoUrl);
-    } else {
-      return FileImage(File(photoUrl));
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: buildAppBar(),
+      appBar: HomeAppBar(user: appUser),
       body: FutureBuilder<List<TaskModel>>(
         future: taskCategories,
         builder: (context, snapshot) {
@@ -135,319 +123,14 @@ class HomePageState extends State<HomePage> {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       elevation: 0,
       backgroundColor: Colors.black,
-      onPressed: () {
-        TextEditingController descriptionController = TextEditingController();
-        DateTime selectedDate = DateTime.now();
-        TimeOfDay selectedTime = TimeOfDay.now();
-        String dropdownValue = 'Personal';
-
-        Future<void> selectDate(
-            BuildContext context, StateSetter setState) async {
-          final DateTime? picked = await showDatePicker(
-            context: context,
-            initialDate: selectedDate,
-            firstDate: DateTime.now(),
-            lastDate: DateTime(2101),
-          );
-          if (picked != null && picked != selectedDate) {
-            if (mounted) {
-              setState(
-                () {
-                  selectedDate = picked;
-                },
-              );
-            }
-            if (kDebugMode) {
-              print('Selected Date: $selectedDate');
-            }
-          }
-        }
-
-        Future<void> selectTime(
-            BuildContext context, Function updateTime) async {
-          DateTime tempSelectedTime = DateTime.now();
-
-          await showCupertinoModalPopup(
-            context: context,
-            builder: (BuildContext context) {
-              return Container(
-                color: CupertinoColors.systemGrey6,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: <Widget>[
-                    SizedBox(
-                      height: MediaQuery.of(context).copyWith().size.height / 3,
-                      child: CupertinoDatePicker(
-                        mode: CupertinoDatePickerMode.time,
-                        initialDateTime: DateTime.now(),
-                        onDateTimeChanged: (DateTime newTime) {
-                          tempSelectedTime = newTime;
-                          if (kDebugMode) {
-                            print("New Time: $newTime");
-                          }
-                          if (mounted) {
-                            setState(() {
-                              selectedTime = TimeOfDay.fromDateTime(newTime);
-                            });
-                          }
-                        },
-                        use24hFormat: true,
-                        minuteInterval: 1,
-                      ),
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: <Widget>[
-                        CupertinoButton(
-                          onPressed: () {
-                            Navigator.pop(context);
-                          },
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 16, vertical: 10),
-                          child: const Text('Cancel',
-                              style: TextStyle(
-                                  color: CupertinoColors.destructiveRed)),
-                        ),
-                        const SizedBox(width: 20),
-                        CupertinoButton(
-                          onPressed: () {
-                            updateTime(tempSelectedTime);
-                            Navigator.pop(context);
-                          },
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 16, vertical: 10),
-                          child: const Text('OK',
-                              style: TextStyle(color: taskColor)),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              );
-            },
-          );
-        }
-
-        showDialog(
+      onPressed: () => showDialog(
           context: context,
-          builder: (BuildContext context) {
-            return StatefulBuilder(builder: (context, setState) {
-              return AlertDialog(
-                title: const Row(
-                  children: [
-                    Icon(CupertinoIcons.add_circled, color: taskColor),
-                    SizedBox(width: 10),
-                    Text(
-                      'Add New Task',
-                      style:
-                          TextStyle(color: CupertinoColors.darkBackgroundGray),
-                    ),
-                  ],
-                ),
-                content: SingleChildScrollView(
-                    child: ListBody(
-                  children: <Widget>[
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 8.0),
-                      child: Row(
-                        children: [
-                          const Icon(CupertinoIcons.collections,
-                              color: taskColor),
-                          const SizedBox(width: 10),
-                          Expanded(
-                            child: DropdownButtonFormField<String>(
-                              value: dropdownValue,
-                              icon: const Icon(Icons.arrow_drop_down_rounded),
-                              elevation: 16,
-                              style: const TextStyle(
-                                  color: CupertinoColors.darkBackgroundGray),
-                              decoration: InputDecoration(
-                                labelText: 'Category',
-                                labelStyle: const TextStyle(
-                                    color: CupertinoColors.darkBackgroundGray),
-                                enabledBorder: OutlineInputBorder(
-                                  borderSide:
-                                      const BorderSide(color: Colors.grey),
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                focusedBorder: OutlineInputBorder(
-                                  borderSide:
-                                      const BorderSide(color: taskColor),
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                contentPadding: const EdgeInsets.symmetric(
-                                    horizontal: 15, vertical: 10),
-                              ),
-                              onChanged: (String? newValue) {
-                                if (mounted) {
-                                  setState(() {
-                                    dropdownValue = newValue!;
-                                  });
-                                }
-                              },
-                              items: <String>[
-                                'Personal',
-                                'Work',
-                                'Health',
-                                'Other'
-                              ].map<DropdownMenuItem<String>>((String value) {
-                                return DropdownMenuItem<String>(
-                                  value: value,
-                                  child: Text(value),
-                                );
-                              }).toList(),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 8.0),
-                      child: Row(
-                        children: [
-                          const Icon(CupertinoIcons.doc_plaintext,
-                              color: taskColor),
-                          const SizedBox(width: 10),
-                          Expanded(
-                            child: TextField(
-                                controller: descriptionController,
-                                decoration: const InputDecoration(
-                                    labelText: 'Description',
-                                    labelStyle: TextStyle(
-                                        color:
-                                            CupertinoColors.darkBackgroundGray),
-                                    enabledBorder: OutlineInputBorder(
-                                      borderSide:
-                                          BorderSide(color: Colors.grey),
-                                      borderRadius:
-                                          BorderRadius.all(Radius.circular(10)),
-                                    ),
-                                    focusedBorder: OutlineInputBorder(
-                                        borderSide:
-                                            BorderSide(color: taskColor),
-                                        borderRadius: BorderRadius.all(
-                                            Radius.circular(10))))),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    ListTile(
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 0),
-                      leading: const Icon(
-                        CupertinoIcons.calendar_today,
-                        color: taskColor,
-                      ),
-                      title: Text(
-                          "Due Date: ${DateFormat('dd/MM/yy').format(selectedDate)}",
-                          style: const TextStyle(
-                              color: CupertinoColors.darkBackgroundGray)),
-                      trailing: const Icon(Icons.keyboard_arrow_down),
-                      onTap: () => selectDate(context, setState),
-                    ),
-                    ListTile(
-                        contentPadding:
-                            const EdgeInsets.symmetric(horizontal: 0),
-                        leading:
-                            const Icon(CupertinoIcons.time, color: taskColor),
-                        title: Text(
-                            "Due Time: ${selectedTime.hour}:${selectedTime.minute.toString().padLeft(2, '0')}"),
-                        trailing: const Icon(Icons.keyboard_arrow_down),
-                        onTap: () => selectTime(context, (newTime) {
-                              if (mounted) {
-                                setState((() {
-                                  selectedTime =
-                                      TimeOfDay.fromDateTime(newTime);
-                                }));
-                              }
-                            }))
-                  ],
-                )),
-                actions: <Widget>[
-                  TextButton(
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                    child: const Text(
-                      'Cancel',
-                      style: TextStyle(color: Colors.redAccent),
-                    ),
-                  ),
-                  TextButton(
-                    onPressed: () {
-                      String description = descriptionController.text;
-                      String category = dropdownValue;
-                      TaskData newTask = TaskData(
-                        id: '',
-                        category: category,
-                        description: description,
-                        dueDateTime: DateTime(
-                            selectedDate.year,
-                            selectedDate.month,
-                            selectedDate.day,
-                            selectedTime.hour,
-                            selectedTime.minute),
-                      );
-                      widget.addTask(newTask).then((_) {
-                        if (context.mounted) {
-                          Navigator.of(context).pop();
-                          _refreshData();
-                          showSnackBar(context, 'Task successfully added!');
-                        }
-                      });
-                    },
-                    child: const Text(
-                      'Add Task',
-                      style: TextStyle(color: taskColor),
-                    ),
-                  ),
-                ],
-                backgroundColor: Colors.grey[200],
-                shape: const RoundedRectangleBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(20))),
-              );
-            });
-          },
-        );
-      },
+          builder: (_) =>
+              AddTaskDialog(onAdd: widget.addTask.call, onAdded: _refreshData)),
       child: const Icon(
         Icons.add,
         size: 35,
         color: Colors.white,
-      ),
-    );
-  }
-
-  AppBar buildAppBar() {
-    return AppBar(
-      backgroundColor: Colors.white,
-      elevation: 0,
-      automaticallyImplyLeading: false,
-      title: Row(
-        children: [
-          if (appUser != null)
-            SizedBox(
-              height: 40,
-              width: 40,
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(10),
-                child: CircleAvatar(
-                  backgroundImage: _getImageProvider(appUser!.photo),
-                  backgroundColor: Colors.transparent,
-                ),
-              ),
-            ),
-          const SizedBox(width: 10),
-          Text(
-            "Hello, ${appUser?.name ?? 'Earthling'}!",
-            style: const TextStyle(
-              color: Colors.black,
-              fontSize: 26,
-              fontWeight: FontWeight.bold,
-            ),
-          )
-        ],
       ),
     );
   }
