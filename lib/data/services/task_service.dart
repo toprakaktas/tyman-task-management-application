@@ -9,15 +9,23 @@ import 'package:uuid/uuid.dart';
 class TaskService implements TaskRepository {
   final FirebaseFirestore firestore = FirebaseFirestore.instance;
   final FirebaseAuth auth = FirebaseAuth.instance;
+  String? get _uid => auth.currentUser?.uid;
 
   @override
   Future<bool> addTask(TaskData taskData) async {
     try {
       var uuid = const Uuid().v4();
       taskData.id = uuid;
+      final uid = _uid;
+      if (uid == null) {
+        if (kDebugMode) {
+          print('No authenticated user.');
+        }
+        return false;
+      }
       await firestore
           .collection('users')
-          .doc(auth.currentUser!.uid)
+          .doc(uid)
           .collection('tasks')
           .doc(uuid)
           .set(taskData.toMap());
@@ -37,9 +45,16 @@ class TaskService implements TaskRepository {
   @override
   Future<void> deleteTask(String taskId) async {
     try {
+      final uid = _uid;
+      if (uid == null) {
+        if (kDebugMode) {
+          print('No authenticated user.');
+        }
+        return;
+      }
       await firestore
           .collection('users')
-          .doc(auth.currentUser!.uid)
+          .doc(uid)
           .collection('tasks')
           .doc(taskId)
           .delete();
@@ -56,9 +71,16 @@ class TaskService implements TaskRepository {
   @override
   Future<void> updateTask(TaskData task) async {
     try {
+      final uid = _uid;
+      if (uid == null) {
+        if (kDebugMode) {
+          print('No authenticated user.');
+        }
+        return;
+      }
       await firestore
           .collection('users')
-          .doc(auth.currentUser!.uid)
+          .doc(uid)
           .collection('tasks')
           .doc(task.id)
           .update(task.toMap());
@@ -81,9 +103,16 @@ class TaskService implements TaskRepository {
       print("Querying from $start to $end in category: $category");
     }
     try {
+      final uid = _uid;
+      if (uid == null) {
+        if (kDebugMode) {
+          print('No authenticated user.');
+        }
+        return <TaskData>[];
+      }
       QuerySnapshot snapshot = await firestore
           .collection('users')
-          .doc(auth.currentUser!.uid)
+          .doc(uid)
           .collection('tasks')
           .where('category', isEqualTo: category)
           .where('dueDateTime', isGreaterThanOrEqualTo: start)
@@ -109,10 +138,18 @@ class TaskService implements TaskRepository {
       TaskModel.other()
     ];
 
+    final uid = _uid;
+    if (uid == null) {
+      if (kDebugMode) {
+        print('No authenticated user.');
+      }
+      return <TaskModel>[];
+    }
+
     for (var taskCategory in taskCategories) {
       QuerySnapshot snapshot = await firestore
           .collection('users')
-          .doc(auth.currentUser!.uid)
+          .doc(uid)
           .collection('tasks')
           .where('category', isEqualTo: taskCategory.title)
           .where('dueDateTime', isGreaterThanOrEqualTo: start)
@@ -161,9 +198,17 @@ class TaskService implements TaskRepository {
     DateTime startOfDay = DateTime(now.year, now.month, now.day);
     DateTime endOfDay = DateTime(now.year, now.month, now.day, 23, 59, 59);
 
+    final uid = _uid;
+    if (uid == null) {
+      if (kDebugMode) {
+        print('No authenticated user.');
+      }
+      return <TaskData>[];
+    }
+
     QuerySnapshot query = await firestore
         .collection('users')
-        .doc(auth.currentUser!.uid)
+        .doc(uid)
         .collection('tasks')
         .where('dueDateTime', isGreaterThanOrEqualTo: startOfDay)
         .where('dueDateTime', isLessThanOrEqualTo: endOfDay)
