@@ -10,7 +10,7 @@ import 'package:tyman/domain/usecases/task/fetch_task_counts_for_categories.dart
 import 'package:tyman/domain/usecases/user/fetch_user_profile.dart';
 import 'package:tyman/features/authentication/presentation/sign_in_page.dart';
 import 'package:tyman/features/authentication/presentation/sign_up_page.dart';
-import 'package:tyman/features/tasks/presentation/home.dart';
+import 'package:tyman/features/tasks/presentation/home_page.dart';
 
 class AuthenticationWrapper extends StatefulWidget {
   const AuthenticationWrapper({super.key});

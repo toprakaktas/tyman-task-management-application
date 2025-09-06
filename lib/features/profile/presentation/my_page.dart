@@ -19,7 +19,7 @@ import 'package:tyman/domain/usecases/user/fetch_user_profile.dart';
 import 'package:tyman/domain/usecases/user/update_profile.dart';
 import 'package:tyman/domain/usecases/user/upload_profile_image.dart';
 import 'package:tyman/features/authentication/presentation/sign_in_page.dart';
-import 'package:tyman/features/tasks/presentation/home.dart';
+import 'package:tyman/features/tasks/presentation/home_page.dart';
 import 'package:tyman/data/models/app_user.dart';
 
 class MyPage extends StatefulWidget {
