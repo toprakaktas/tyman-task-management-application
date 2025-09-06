@@ -4,7 +4,7 @@ import 'package:tyman/data/services/task_service.dart';
 import 'package:tyman/domain/usecases/task/delete_task.dart';
 import 'package:tyman/domain/usecases/task/fetch_tasks_by_category_and_date.dart';
 import 'package:tyman/domain/usecases/task/update_task.dart';
-import 'package:tyman/features/tasks/presentation/detail.dart';
+import 'package:tyman/features/tasks/presentation/task_detail_page.dart';
 
 class TaskGrid extends StatelessWidget {
   final List<TaskModel> taskCategories;
@@ -29,10 +29,9 @@ class TaskGrid extends StatelessWidget {
     return GestureDetector(
       onTap: () {
         Navigator.of(context).push(MaterialPageRoute(
-          builder: (context) => DetailPage(
+          builder: (context) => TaskDetailPage(
               categoryFilter: task.title,
-              fetchTasksByCategoryAndDate:
-                  FetchTasksByCategoryAndDate(TaskService()),
+              fetchTasks: FetchTasksByCategoryAndDate(TaskService()),
               updateTask: UpdateTask(TaskService()),
               deleteTask: DeleteTask(TaskService())),
         ));
