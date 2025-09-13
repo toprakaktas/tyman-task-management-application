@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
+import 'package:tyman/core/constants/task_filters.dart';
 import 'package:tyman/core/widgets/app_alert_dialog.dart';
 import 'package:tyman/core/widgets/task_card.dart';
 import 'package:tyman/data/models/task_data.dart';
@@ -57,7 +58,7 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
     }
   }
 
-  void onFilterSelected(String filter) {
+  void onFilterSelected(TaskFilter filter) {
     controller.updateFilter(filter);
     if (mounted) {
       tasksFuture = controller.loadTasks();

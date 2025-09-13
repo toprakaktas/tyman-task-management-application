@@ -1,3 +1,4 @@
+import 'package:tyman/core/constants/task_filters.dart';
 import 'package:tyman/data/models/task_data.dart';
 import 'package:tyman/domain/usecases/task/delete_task.dart';
 import 'package:tyman/domain/usecases/task/fetch_tasks_by_category_and_date.dart';
@@ -17,7 +18,7 @@ class TaskDetailController {
   });
 
   DateTime selectedDate = DateTime.now();
-  String selectedFilter = 'Order By';
+  TaskFilter selectedFilter = TaskFilter.orderBy;
 
   Future<List<TaskData>> loadTasks() async {
     final tasks = await fetchTask(category, selectedDate);
@@ -26,11 +27,15 @@ class TaskDetailController {
 
   List<TaskData> _sortTasks(List<TaskData> tasks) {
     switch (selectedFilter) {
-      case 'Deadline':
+      case TaskFilter.time:
         tasks.sort((a, b) => a.dueDateTime.compareTo(b.dueDateTime));
         break;
-      case 'Description':
+      case TaskFilter.description:
         tasks.sort((a, b) => a.description.compareTo(b.description));
+        break;
+
+      /// No sorting needed
+      case TaskFilter.orderBy:
         break;
     }
     return tasks;
@@ -40,7 +45,7 @@ class TaskDetailController {
     selectedDate = date;
   }
 
-  void updateFilter(String filter) {
+  void updateFilter(TaskFilter filter) {
     selectedFilter = filter;
   }
 
