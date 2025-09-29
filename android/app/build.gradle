@@ -28,7 +28,7 @@ if (flutterVersionName == null) {
 
 android {
     compileSdkVersion flutter.compileSdkVersion
-    ndkVersion "25.1.8937393"
+    ndkVersion flutter.ndkVersion
 
     lintOptions{
         warning 'deprecation'
@@ -36,13 +36,13 @@ android {
     }
     
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
         coreLibraryDesugaringEnabled true
     }
 
     kotlinOptions {
-        jvmTarget = '1.8'
+        jvmTarget = '17'
     }
 
     sourceSets {
@@ -54,7 +54,7 @@ android {
         applicationId "com.example.tyman"
         // You can update the following values to match your application needs.
         // For more information, see: https://docs.flutter.dev/deployment/android#reviewing-the-gradle-build-configuration.
-        minSdkVersion 23
+        minSdkVersion flutter.minSdkVersion
         targetSdkVersion flutter.targetSdkVersion
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
@@ -64,7 +64,6 @@ android {
 
     buildTypes {
         release {
-            // TODO: Add your own signing config for the release build.
             // Signing with the debug keys for now, so `flutter run --release` works.
             signingConfig signingConfigs.debug
         }
@@ -79,12 +78,12 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation 'com.android.support:multidex:1.0.3'
      // Import the BoM for the Firebase platform
-    implementation(platform("com.google.firebase:firebase-bom:33.16.0"))
-    implementation 'com.google.firebase:firebase-auth:23.2.1'
-    implementation 'com.google.firebase:firebase-firestore:25.1.4'
-    implementation 'com.google.android.gms:play-services-auth:21.3.0'
-    implementation 'com.google.android.gms:play-services-base:18.7.0'
-    implementation 'com.google.android.gms:play-services-tasks:18.3.0'
+    implementation(platform("com.google.firebase:firebase-bom:34.3.0"))
+    implementation 'com.google.firebase:firebase-auth:24.0.1'
+    implementation 'com.google.firebase:firebase-firestore:26.0.1'
+    implementation 'com.google.android.gms:play-services-auth:21.4.0'
+    implementation 'com.google.android.gms:play-services-base:18.9.0'
+    implementation 'com.google.android.gms:play-services-tasks:18.4.0'
 
     // Add the dependency for the Performance Monitoring library
     // When using the BoM, you don't specify versions in Firebase library dependencies
