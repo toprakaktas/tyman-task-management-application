@@ -16,15 +16,15 @@ Future<void> main() async {
       .then((_) => runApp(ProviderScope(child: MyApp(apiKey: apiKey))));
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends ConsumerWidget {
   const MyApp({super.key, String? apiKey});
 
   // This widget is the root of your application.
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     SystemChrome.setSystemUIOverlayStyle(
         const SystemUiOverlayStyle(statusBarColor: Colors.transparent));
-    final router = ProviderScope.containerOf(context).read(routerProvider);
+    final router = ref.watch(routerProvider);
     return MaterialApp.router(
       debugShowCheckedModeBanner: false,
       title: 'TyMan',

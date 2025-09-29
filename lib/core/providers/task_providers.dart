@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:tyman/core/providers/auth_providers.dart';
 import 'package:tyman/data/models/task_data.dart';
 import 'package:tyman/data/models/task_model.dart';
 import 'package:tyman/data/services/task_service.dart';
@@ -33,12 +34,25 @@ final fetchTasksForTodayProvider = Provider<FetchTasksForToday>(
     (ref) => FetchTasksForToday(ref.watch(taskServiceProvider)));
 
 final taskCountsProvider = FutureProvider<List<TaskModel>>((ref) async {
-  final fetchTaskCounts = FetchTaskCountsForCategories(TaskService());
+  final authState = ref.watch(authStateProvider);
+  if (authState.hasError) throw authState.error!;
+  final user = authState.maybeWhen(data: (user) => user, orElse: () => null);
+  if (user == null) {
+    return <TaskModel>[];
+  }
+  final fetchTaskCounts = ref.watch(fetchTaskCountsForCategoriesProvider);
   return fetchTaskCounts();
 });
 
-final tasksForTodayProvider = FutureProvider<List<TaskData>>(
-    (ref) => ref.watch(fetchTasksForTodayProvider)());
+final tasksForTodayProvider = FutureProvider<List<TaskData>>((ref) async {
+  final authState = ref.watch(authStateProvider);
+  if (authState.hasError) throw authState.error!;
+  final user = authState.maybeWhen(data: (user) => user, orElse: () => null);
+  if (user == null) {
+    return <TaskData>[];
+  }
+  return ref.watch(fetchTasksForTodayProvider)();
+});
 
 final taskDetailControllerProvider =
     Provider.family<TaskDetailController, String>((ref, category) {

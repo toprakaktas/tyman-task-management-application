@@ -18,7 +18,10 @@ final uploadProfileImageProvider = Provider<UploadProfileImage>(
     (ref) => UploadProfileImage(ref.read(userServiceProvider)));
 
 final userProfileProvider = FutureProvider<AppUser?>((ref) async {
-  final authUser = ref.watch(authStateProvider).value;
+  final authState = ref.watch(authStateProvider);
+  final authUser =
+      authState.maybeWhen(data: (user) => user, orElse: () => null);
+  if (authState.hasError) throw authState.error!;
   if (authUser == null) return null;
-  return ref.read(fetchUserProfileProvider)(authUser.uid);
+  return ref.watch(fetchUserProfileProvider)(authUser.uid);
 });

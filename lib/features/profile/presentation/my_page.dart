@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:tyman/core/providers/auth_providers.dart';
+import 'package:tyman/core/providers/task_providers.dart';
 import 'package:tyman/core/providers/user_provider.dart';
 import 'package:tyman/core/utils/snackbar_helper.dart';
 import 'package:tyman/core/widgets/app_bottom_nav_bar.dart';
@@ -23,6 +24,7 @@ class MyPage extends ConsumerStatefulWidget {
 class MyPageState extends ConsumerState<MyPage> {
   final TextEditingController nameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
+  String? _loadedUserId;
 
   @override
   void dispose() {
@@ -56,13 +58,17 @@ class MyPageState extends ConsumerState<MyPage> {
     final file = File(picked.path);
 
     try {
-      final downloadUrl = await ref.watch(uploadProfileImageProvider)(file);
-      await ref.watch(updateProfileProvider)(
+      final uploadProfileImage = ref.read(uploadProfileImageProvider);
+      final updateProfile = ref.read(updateProfileProvider);
+      final downloadUrl = await uploadProfileImage(file);
+      await updateProfile(
         appUser,
         nameController.text,
         emailController.text,
         downloadUrl,
       );
+      appUser.photo = downloadUrl;
+      await _refreshUserProfile();
       if (mounted) {
         showSnackBar(context, 'Profile picture updated successfully');
       }
@@ -74,12 +80,14 @@ class MyPageState extends ConsumerState<MyPage> {
 
   Future<void> _updateProfile(AppUser appUser) async {
     try {
-      await ref.watch(updateProfileProvider)(
+      final updateProfile = ref.read(updateProfileProvider);
+      await updateProfile(
         appUser,
         nameController.text,
         emailController.text,
         appUser.photo,
       );
+      await _refreshUserProfile();
       if (mounted) {
         showSnackBar(context, 'Profile updated successfully');
       }
@@ -92,7 +100,10 @@ class MyPageState extends ConsumerState<MyPage> {
 
   Future<void> _signOut(BuildContext context) async {
     try {
-      await ref.watch(signOutProvider)(context);
+      await ref.read(signOutProvider)(context);
+      ref.invalidate(userProfileProvider);
+      ref.invalidate(taskCountsProvider);
+      ref.invalidate(tasksForTodayProvider);
     } catch (e) {
       if (context.mounted) {
         showSnackBar(context, 'Error signing out. Try again.');
@@ -100,13 +111,26 @@ class MyPageState extends ConsumerState<MyPage> {
     }
   }
 
+  Future<void> _refreshUserProfile() async {
+    ref.invalidate(userProfileProvider);
+    try {
+      await ref.read(userProfileProvider.future);
+    } catch (_) {}
+  }
+
   ImageProvider _getImageProvider(String photoUrl) {
+    if (photoUrl.isEmpty)
+      return const AssetImage('assets/images/userAvatar.png');
     if (photoUrl.startsWith('http')) {
       return NetworkImage(photoUrl);
     } else if (photoUrl.startsWith('assets/')) {
       return AssetImage(photoUrl);
     } else {
-      return FileImage(File(photoUrl));
+      try {
+        final file = File(photoUrl);
+        if (file.existsSync() && file.lengthSync() > 0) return FileImage(file);
+      } catch (_) {}
+      return const AssetImage('assets/images/userAvatar.png');
     }
   }
 
@@ -128,11 +152,10 @@ class MyPageState extends ConsumerState<MyPage> {
           );
         }
 
-        if (nameController.text.isEmpty) {
+        if (_loadedUserId != appUser.uid) {
           nameController.text = appUser.name;
-        }
-        if (emailController.text.isEmpty) {
           emailController.text = appUser.email;
+          _loadedUserId = appUser.uid;
         }
 
         return Container(
