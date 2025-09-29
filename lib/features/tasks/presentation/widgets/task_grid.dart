@@ -1,15 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:tyman/data/models/task_model.dart';
-import 'package:tyman/data/services/task_service.dart';
-import 'package:tyman/domain/usecases/task/delete_task.dart';
-import 'package:tyman/domain/usecases/task/fetch_tasks_by_category_and_date.dart';
-import 'package:tyman/domain/usecases/task/update_task.dart';
 import 'package:tyman/features/tasks/presentation/task_detail_page.dart';
 
 class TaskGrid extends StatelessWidget {
   final List<TaskModel> taskCategories;
+  final VoidCallback? onChanged;
 
-  const TaskGrid({super.key, required this.taskCategories});
+  const TaskGrid({super.key, required this.taskCategories, this.onChanged});
 
   @override
   Widget build(BuildContext context) {
@@ -27,14 +24,13 @@ class TaskGrid extends StatelessWidget {
 
   Widget _buildTaskCard(BuildContext context, TaskModel task) {
     return GestureDetector(
-      onTap: () {
-        Navigator.of(context).push(MaterialPageRoute(
-          builder: (context) => TaskDetailPage(
-              categoryFilter: task.title,
-              fetchTasks: FetchTasksByCategoryAndDate(TaskService()),
-              updateTask: UpdateTask(TaskService()),
-              deleteTask: DeleteTask(TaskService())),
+      onTap: () async {
+        final result = await Navigator.of(context).push(MaterialPageRoute(
+          builder: (context) => TaskDetailPage(categoryFilter: task.title),
         ));
+        if (result == true && onChanged != null) {
+          onChanged!();
+        }
       },
       child: Card(
         elevation: 3.0, // Shadow

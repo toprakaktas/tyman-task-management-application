@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'dart:math';
 import 'package:tyman/core/constants/colors.dart';
-import 'package:tyman/domain/usecases/auth/sign_up.dart';
+import 'package:tyman/core/providers/auth_providers.dart';
 
-class SignUpPage extends StatefulWidget {
-  final VoidCallback show;
-  final SignUp signUp;
-  const SignUpPage(this.show, {super.key, required this.signUp});
+class SignUpPage extends ConsumerStatefulWidget {
+  const SignUpPage({super.key});
 
   @override
-  SignUpPageState createState() => SignUpPageState();
+  ConsumerState<SignUpPage> createState() => SignUpPageState();
 }
 
-class SignUpPageState extends State<SignUpPage> {
+class SignUpPageState extends ConsumerState<SignUpPage> {
   FocusNode focusNode1 = FocusNode();
   FocusNode focusNode2 = FocusNode();
   FocusNode focusNode3 = FocusNode();
@@ -108,7 +108,7 @@ class SignUpPageState extends State<SignUpPage> {
           ),
           const SizedBox(width: 5),
           GestureDetector(
-            onTap: widget.show,
+            onTap: () => context.go('/signin'),
             child: const Text(
               'Sign In',
               style: TextStyle(
@@ -127,7 +127,7 @@ class SignUpPageState extends State<SignUpPage> {
       padding: const EdgeInsets.symmetric(horizontal: 100),
       child: GestureDetector(
         onTap: () {
-          widget.signUp(
+          ref.watch(signUpProvider)(
               email.text, password.text, passwordConfirm.text, context);
         },
         child: Container(

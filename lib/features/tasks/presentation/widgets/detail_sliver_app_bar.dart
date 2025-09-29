@@ -1,10 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:tyman/data/services/task_service.dart';
-import 'package:tyman/data/services/user_service.dart';
-import 'package:tyman/domain/usecases/task/add_task.dart';
-import 'package:tyman/domain/usecases/task/fetch_task_counts_for_categories.dart';
-import 'package:tyman/domain/usecases/user/fetch_user_profile.dart';
-import 'package:tyman/features/tasks/presentation/home_page.dart';
 
 class DetailSliverAppBar extends StatelessWidget {
   final String category;
@@ -24,11 +18,7 @@ class DetailSliverAppBar extends StatelessWidget {
       expandedHeight: 90,
       backgroundColor: Colors.black,
       leading: IconButton(
-        onPressed: () => Navigator.of(context).push(MaterialPageRoute(
-            builder: (context) => HomePage(
-                fetchTaskCounts: FetchTaskCountsForCategories(TaskService()),
-                addTask: AddTask(TaskService()),
-                fetchUserProfile: FetchUserProfile(UserService())))),
+        onPressed: () => Navigator.of(context).maybePop(true),
         icon: const Icon(Icons.arrow_back_ios_new_rounded),
         iconSize: 20,
       ),

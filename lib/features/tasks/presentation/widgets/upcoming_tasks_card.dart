@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:tyman/data/services/task_service.dart';
-import 'package:tyman/domain/usecases/task/fetch_tasks_for_today.dart';
 import 'package:tyman/features/tasks/presentation/upcoming_tasks_page.dart';
 
 class UpcomingTasksCard extends StatelessWidget {
@@ -13,9 +11,8 @@ class UpcomingTasksCard extends StatelessWidget {
         Navigator.push(
             context,
             MaterialPageRoute(
-                builder: (_) => UpcomingTasksPage(
-                      fetchTasksForToday: FetchTasksForToday(TaskService()),
-                    )));
+              builder: (_) => UpcomingTasksPage(),
+            ));
       },
       child: Stack(
         children: [

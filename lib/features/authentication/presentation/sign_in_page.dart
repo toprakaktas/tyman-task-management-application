@@ -1,19 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'dart:math';
 import 'package:tyman/core/constants/colors.dart';
-import 'package:tyman/domain/usecases/auth/sign_in.dart';
+import 'package:tyman/core/providers/auth_providers.dart';
 
-class SignInPage extends StatefulWidget {
-  final VoidCallback show;
-  final SignIn signIn;
-
-  const SignInPage(this.show, {super.key, required this.signIn});
+class SignInPage extends ConsumerStatefulWidget {
+  const SignInPage({super.key});
 
   @override
-  SignInPageState createState() => SignInPageState();
+  ConsumerState<SignInPage> createState() => SignInPageState();
 }
 
-class SignInPageState extends State<SignInPage> {
+class SignInPageState extends ConsumerState<SignInPage> {
   FocusNode focusNode1 = FocusNode();
   FocusNode focusNode2 = FocusNode();
 
@@ -103,7 +102,7 @@ class SignInPageState extends State<SignInPage> {
           ),
           const SizedBox(width: 5),
           GestureDetector(
-            onTap: widget.show,
+            onTap: () => context.go('/signup'),
             child: const Text(
               'Sign Up',
               style: TextStyle(
@@ -122,7 +121,7 @@ class SignInPageState extends State<SignInPage> {
       padding: const EdgeInsets.symmetric(horizontal: 100),
       child: GestureDetector(
         onTap: () {
-          widget.signIn(email.text, password.text, context);
+          ref.watch(signInProvider)(email.text, password.text, context);
         },
         child: Container(
           alignment: Alignment.center,

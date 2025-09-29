@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:tyman/core/constants/task_filters.dart';
+import 'package:tyman/core/providers/task_providers.dart';
 import 'package:tyman/core/widgets/app_alert_dialog.dart';
 import 'package:tyman/core/widgets/task_card.dart';
 import 'package:tyman/data/models/task_data.dart';
-import 'package:tyman/domain/usecases/task/delete_task.dart';
-import 'package:tyman/domain/usecases/task/fetch_tasks_by_category_and_date.dart';
-import 'package:tyman/domain/usecases/task/update_task.dart';
 import 'package:tyman/features/tasks/presentation/controllers/task_detail_controller.dart';
 import 'package:tyman/features/tasks/presentation/widgets/date_picker.dart';
 import 'package:tyman/features/tasks/presentation/widgets/delete_task_dialog.dart';
@@ -14,37 +13,27 @@ import 'package:tyman/features/tasks/presentation/widgets/detail_sliver_app_bar.
 import 'package:tyman/features/tasks/presentation/widgets/edit_task_dialog.dart';
 import 'package:tyman/features/tasks/presentation/widgets/task_title.dart';
 
-class TaskDetailPage extends StatefulWidget {
+class TaskDetailPage extends ConsumerStatefulWidget {
   final String categoryFilter;
-  final FetchTasksByCategoryAndDate fetchTasks;
-  final UpdateTask updateTask;
-  final DeleteTask deleteTask;
 
   const TaskDetailPage({
     super.key,
     required this.categoryFilter,
-    required this.fetchTasks,
-    required this.updateTask,
-    required this.deleteTask,
   });
 
   @override
-  State<TaskDetailPage> createState() => _TaskDetailPageState();
+  ConsumerState<TaskDetailPage> createState() => _TaskDetailPageState();
 }
 
-class _TaskDetailPageState extends State<TaskDetailPage> {
+class _TaskDetailPageState extends ConsumerState<TaskDetailPage> {
   late TaskDetailController controller;
   late Future<List<TaskData>> tasksFuture;
+  bool hasChanges = false;
 
   @override
   void initState() {
     super.initState();
-    controller = TaskDetailController(
-      category: widget.categoryFilter,
-      fetchTask: widget.fetchTasks,
-      updateTask: widget.updateTask,
-      deleteTask: widget.deleteTask,
-    );
+    controller = ref.read(taskDetailControllerProvider(widget.categoryFilter));
     tasksFuture = controller.loadTasks();
   }
 
@@ -81,6 +70,7 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
       }
       tasksFuture = controller.loadTasks();
       setState(() {});
+      hasChanges = true;
       if (mounted) showSuccess(context, 'Task updated successfully!');
     }
   }
@@ -97,6 +87,7 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
       }
       tasksFuture = controller.loadTasks();
       setState(() {});
+      hasChanges = true;
       if (mounted) showSuccess(context, 'Task deleted successfully!');
     }
   }
@@ -112,6 +103,7 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
     }
     tasksFuture = controller.loadTasks();
     setState(() {});
+    hasChanges = true;
     final message = updatedTask.completed
         ? 'Well done! You have completed the task!'
         : 'Task marked as not completed.';
@@ -120,7 +112,12 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return WillPopScope(
+      onWillPop: () async {
+        Navigator.of(context).pop(hasChanges);
+        return false;
+      },
+      child: Scaffold(
       backgroundColor: Colors.black,
       body: FutureBuilder<List<TaskData>>(
         future: tasksFuture,
@@ -196,6 +193,7 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
           );
         },
       ),
+    ),
     );
   }
 }

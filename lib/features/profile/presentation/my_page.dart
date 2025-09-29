@@ -1,56 +1,28 @@
 import 'dart:math';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:tyman/core/providers/auth_providers.dart';
+import 'package:tyman/core/providers/user_provider.dart';
 import 'package:tyman/core/utils/snackbar_helper.dart';
 import 'package:tyman/core/widgets/app_bottom_nav_bar.dart';
 import 'package:tyman/core/widgets/custom_text_field.dart';
-import 'package:tyman/data/services/auth_service.dart';
-import 'package:tyman/data/services/task_service.dart';
 import 'dart:io';
 import 'package:tyman/core/constants/colors.dart';
-import 'package:tyman/data/services/user_service.dart';
-import 'package:tyman/domain/usecases/auth/sign_in.dart';
-import 'package:tyman/domain/usecases/auth/sign_out.dart';
-import 'package:tyman/domain/usecases/task/add_task.dart';
-import 'package:tyman/domain/usecases/task/fetch_task_counts_for_categories.dart';
-import 'package:tyman/domain/usecases/user/fetch_user_profile.dart';
-import 'package:tyman/domain/usecases/user/update_profile.dart';
-import 'package:tyman/domain/usecases/user/upload_profile_image.dart';
-import 'package:tyman/features/authentication/presentation/sign_in_page.dart';
-import 'package:tyman/features/tasks/presentation/home_page.dart';
+import 'package:go_router/go_router.dart';
 import 'package:tyman/data/models/app_user.dart';
 
-class MyPage extends StatefulWidget {
-  final FetchUserProfile fetchUserProfile;
-  final UpdateProfile updateProfile;
-  final SignOut signOut;
-  final UploadProfileImage uploadProfileImage;
-
-  const MyPage({
-    super.key,
-    required this.fetchUserProfile,
-    required this.updateProfile,
-    required this.signOut,
-    required this.uploadProfileImage,
-  });
+class MyPage extends ConsumerStatefulWidget {
+  const MyPage({super.key});
 
   @override
-  MyPageState createState() => MyPageState();
+  ConsumerState<MyPage> createState() => MyPageState();
 }
 
-class MyPageState extends State<MyPage> {
-  AppUser? appUser;
-  final User? firebaseUser = FirebaseAuth.instance.currentUser;
+class MyPageState extends ConsumerState<MyPage> {
   final TextEditingController nameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
-
-  @override
-  void initState() {
-    super.initState();
-    _loadUserProfile();
-  }
 
   @override
   void dispose() {
@@ -59,22 +31,7 @@ class MyPageState extends State<MyPage> {
     super.dispose();
   }
 
-  Future<void> _loadUserProfile() async {
-    final user = await widget.fetchUserProfile(firebaseUser!.uid);
-    if (mounted) {
-      if (user == null) {
-        FirebaseAuth.instance.signOut();
-        return;
-      }
-      setState(() {
-        appUser = user;
-        nameController.text = appUser!.name;
-        emailController.text = appUser!.email;
-      });
-    }
-  }
-
-  Future<void> _pickImage() async {
+  Future<void> _pickImage(AppUser appUser) async {
     final source = await showDialog<ImageSource>(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -99,10 +56,9 @@ class MyPageState extends State<MyPage> {
     final file = File(picked.path);
 
     try {
-      final downloadUrl = await widget.uploadProfileImage(file);
-      setState(() => appUser!.photo = downloadUrl);
-      await widget.updateProfile(
-        appUser!,
+      final downloadUrl = await ref.watch(uploadProfileImageProvider)(file);
+      await ref.watch(updateProfileProvider)(
+        appUser,
         nameController.text,
         emailController.text,
         downloadUrl,
@@ -116,13 +72,13 @@ class MyPageState extends State<MyPage> {
     }
   }
 
-  Future<void> _updateProfile() async {
+  Future<void> _updateProfile(AppUser appUser) async {
     try {
-      await widget.updateProfile(
-        appUser!,
+      await ref.watch(updateProfileProvider)(
+        appUser,
         nameController.text,
         emailController.text,
-        appUser!.photo,
+        appUser.photo,
       );
       if (mounted) {
         showSnackBar(context, 'Profile updated successfully');
@@ -136,7 +92,7 @@ class MyPageState extends State<MyPage> {
 
   Future<void> _signOut(BuildContext context) async {
     try {
-      await widget.signOut(context);
+      await ref.watch(signOutProvider)(context);
     } catch (e) {
       if (context.mounted) {
         showSnackBar(context, 'Error signing out. Try again.');
@@ -156,52 +112,68 @@ class MyPageState extends State<MyPage> {
 
   @override
   Widget build(BuildContext context) {
-    if (appUser == null) {
-      return SignInPage(() {}, signIn: SignIn(AuthService()));
-    }
+    final userAsync = ref.watch(userProfileProvider);
 
-    return Container(
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          tileMode: TileMode.mirror,
-          colors: [
-            designBlack,
-            designGreyDark,
-            designGrey,
-            designGreyLight,
-            designWhiteGrey,
-          ],
-          transform: GradientRotation(pi / 4),
-        ),
+    return userAsync.when(
+      loading: () => const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
       ),
-      child: Scaffold(
-        backgroundColor: Colors.transparent,
-        appBar: AppBar(
-          backgroundColor: Colors.transparent,
-          elevation: 0,
-          title: const Text('My Profile',
-              style: TextStyle(color: Colors.white, fontSize: 22)),
-          centerTitle: true,
-        ),
-        body: _buildProfileContent(),
-        bottomNavigationBar: AppBottomNavBar(
-            currentIndex: 1,
-            onTap: (index) {
-              if (index == 0) {
-                Navigator.of(context).pushReplacement(MaterialPageRoute(
-                    builder: (context) => HomePage(
-                        fetchTaskCounts:
-                            FetchTaskCountsForCategories(TaskService()),
-                        addTask: AddTask(TaskService()),
-                        fetchUserProfile: FetchUserProfile(UserService()))));
-              }
-            }),
+      error: (e, _) => Scaffold(
+        body: Center(child: Text('Error: $e')),
       ),
+      data: (appUser) {
+        if (appUser == null) {
+          return const Scaffold(
+            body: Center(child: CircularProgressIndicator()),
+          );
+        }
+
+        if (nameController.text.isEmpty) {
+          nameController.text = appUser.name;
+        }
+        if (emailController.text.isEmpty) {
+          emailController.text = appUser.email;
+        }
+
+        return Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              tileMode: TileMode.mirror,
+              colors: [
+                designBlack,
+                designGreyDark,
+                designGrey,
+                designGreyLight,
+                designWhiteGrey,
+              ],
+              transform: GradientRotation(pi / 4),
+            ),
+          ),
+          child: Scaffold(
+            backgroundColor: Colors.transparent,
+            appBar: AppBar(
+              backgroundColor: Colors.transparent,
+              elevation: 0,
+              title: const Text('My Profile',
+                  style: TextStyle(color: Colors.white, fontSize: 22)),
+              centerTitle: true,
+            ),
+            body: _buildProfileContent(appUser),
+            bottomNavigationBar: AppBottomNavBar(
+                currentIndex: 1,
+                onTap: (index) {
+                  if (index == 0) {
+                    context.go('/home');
+                  }
+                }),
+          ),
+        );
+      },
     );
   }
 
-  Widget _buildProfileContent() {
+  Widget _buildProfileContent(AppUser appUser) {
     return Center(
       child: SingleChildScrollView(
         padding: const EdgeInsets.all(20.5),
@@ -209,12 +181,12 @@ class MyPageState extends State<MyPage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             GestureDetector(
-              onTap: _pickImage,
+              onTap: () => _pickImage(appUser),
               child: Stack(
                 children: [
                   CircleAvatar(
                     radius: 60,
-                    backgroundImage: _getImageProvider(appUser!.photo),
+                    backgroundImage: _getImageProvider(appUser.photo),
                     backgroundColor: Colors.transparent,
                   ),
                   Positioned(
@@ -244,7 +216,7 @@ class MyPageState extends State<MyPage> {
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
                 CupertinoButton(
-                  onPressed: _updateProfile,
+                  onPressed: () => _updateProfile(appUser),
                   color: CupertinoColors.systemGrey3,
                   child: const Text('Update Profile'),
                 ),
