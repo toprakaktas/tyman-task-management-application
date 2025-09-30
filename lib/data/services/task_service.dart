@@ -99,9 +99,7 @@ class TaskService implements TaskRepository {
       String category, DateTime date) async {
     DateTime start = DateTime(date.year, date.month, date.day, 0, 0);
     DateTime end = DateTime(date.year, date.month, date.day, 23, 59, 59);
-    if (kDebugMode) {
-      print("Querying from $start to $end in category: $category");
-    }
+
     try {
       final uid = _uid;
       if (uid == null) {
@@ -156,20 +154,10 @@ class TaskService implements TaskRepository {
           .where('dueDateTime', isLessThanOrEqualTo: end)
           .get();
 
-      if (kDebugMode) {
-        print('Category: ${taskCategory.title}');
-      }
-      if (kDebugMode) {
-        print('Documents Retrieved: ${snapshot.docs.length}');
-      }
-
       int leftCount = 0;
       int doneCount = 0;
 
       for (var doc in snapshot.docs) {
-        if (kDebugMode) {
-          print('Document Data: ${doc.data()}');
-        }
         bool completed =
             (doc.data() as Map<String, dynamic>)['completed'] ?? false;
         if (completed == false) {
@@ -177,13 +165,6 @@ class TaskService implements TaskRepository {
         } else if (completed == true) {
           doneCount++;
         }
-      }
-
-      if (kDebugMode) {
-        print('Left Count: $leftCount');
-      }
-      if (kDebugMode) {
-        print('Done Count: $doneCount');
       }
 
       taskCategory.left = leftCount;
