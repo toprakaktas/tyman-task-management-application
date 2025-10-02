@@ -112,88 +112,90 @@ class _TaskDetailPageState extends ConsumerState<TaskDetailPage> {
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () async {
-        Navigator.of(context).pop(hasChanges);
-        return false;
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) {
+        if (didPop) return;
+        Navigator.of(context).pop<bool>(hasChanges);
       },
       child: Scaffold(
-      backgroundColor: Colors.black,
-      body: FutureBuilder<List<TaskData>>(
-        future: tasksFuture,
-        builder: (context, snapshot) {
-          int taskLeft = 0;
-          if (snapshot.hasData && snapshot.data != null) {
-            taskLeft =
-                snapshot.data!.where((task) => task.completed == false).length;
-          }
-          List<Widget> slivers = [
-            DetailSliverAppBar(
-                category: widget.categoryFilter, taskLeft: taskLeft),
-            SliverToBoxAdapter(
-              child: Container(
-                decoration: const BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(30),
-                      topRight: Radius.circular(30)),
-                ),
-                child: Column(
-                  children: [
-                    DatePicker(onDateChanged: onDateSelected),
-                    TaskTitle(
-                        onFilterSelected: onFilterSelected,
-                        selectedFilter: controller.selectedFilter),
-                  ],
-                ),
-              ),
-            ),
-          ];
-
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            slivers.add(
-              const SliverFillRemaining(
-                child: Center(child: CircularProgressIndicator()),
-              ),
-            );
-          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            slivers.add(
-              SliverFillRemaining(
+        backgroundColor: Colors.black,
+        body: FutureBuilder<List<TaskData>>(
+          future: tasksFuture,
+          builder: (context, snapshot) {
+            int taskLeft = 0;
+            if (snapshot.hasData && snapshot.data != null) {
+              taskLeft = snapshot.data!
+                  .where((task) => task.completed == false)
+                  .length;
+            }
+            List<Widget> slivers = [
+              DetailSliverAppBar(
+                  category: widget.categoryFilter, taskLeft: taskLeft),
+              SliverToBoxAdapter(
                 child: Container(
-                  color: Colors.white,
-                  child: const Center(
-                    child: Text('There are no tasks for today.',
-                        style: TextStyle(color: Colors.grey, fontSize: 18)),
+                  decoration: const BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(30),
+                        topRight: Radius.circular(30)),
+                  ),
+                  child: Column(
+                    children: [
+                      DatePicker(onDateChanged: onDateSelected),
+                      TaskTitle(
+                          onFilterSelected: onFilterSelected,
+                          selectedFilter: controller.selectedFilter),
+                    ],
                   ),
                 ),
               ),
-            );
-          } else {
-            slivers.add(
-              SliverList(
-                delegate: SliverChildBuilderDelegate(
-                  (_, index) {
-                    TaskData task = snapshot.data![index];
-                    return TaskCard(
-                      task: task,
-                      interactive: true,
-                      onEdit: () => editTask(task),
-                      onDelete: () => deleteTask(task),
-                      onMarkDone: () => markTaskAsDone(task),
-                    );
-                  },
-                  childCount: snapshot.data!.length,
-                ),
-              ),
-            );
-          }
+            ];
 
-          return CustomScrollView(
-            slivers: slivers,
-          );
-        },
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              slivers.add(
+                const SliverFillRemaining(
+                  child: Center(child: CircularProgressIndicator()),
+                ),
+              );
+            } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+              slivers.add(
+                SliverFillRemaining(
+                  child: Container(
+                    color: Colors.white,
+                    child: const Center(
+                      child: Text('There are no tasks for today.',
+                          style: TextStyle(color: Colors.grey, fontSize: 18)),
+                    ),
+                  ),
+                ),
+              );
+            } else {
+              slivers.add(
+                SliverList(
+                  delegate: SliverChildBuilderDelegate(
+                    (_, index) {
+                      TaskData task = snapshot.data![index];
+                      return TaskCard(
+                        task: task,
+                        interactive: true,
+                        onEdit: () => editTask(task),
+                        onDelete: () => deleteTask(task),
+                        onMarkDone: () => markTaskAsDone(task),
+                      );
+                    },
+                    childCount: snapshot.data!.length,
+                  ),
+                ),
+              );
+            }
+
+            return CustomScrollView(
+              slivers: slivers,
+            );
+          },
+        ),
       ),
-    ),
     );
   }
 }
