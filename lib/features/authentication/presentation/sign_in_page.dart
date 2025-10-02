@@ -1,9 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/legacy.dart';
 import 'package:go_router/go_router.dart';
 import 'dart:math';
 import 'package:tyman/core/constants/colors.dart';
 import 'package:tyman/core/providers/auth_providers.dart';
+
+final signInPasswordObscuredProvider =
+    StateProvider.autoDispose<bool>((ref) => true);
+final signInEmailFocusProvider =
+    StateProvider.autoDispose<bool>((ref) => false);
+final signInPasswordFocusProvider =
+    StateProvider.autoDispose<bool>((ref) => false);
 
 class SignInPage extends ConsumerStatefulWidget {
   const SignInPage({super.key});
@@ -19,39 +27,41 @@ class SignInPageState extends ConsumerState<SignInPage> {
   final email = TextEditingController();
   final password = TextEditingController();
 
-  bool passwordVisible = true;
-
   @override
   void initState() {
     super.initState();
     focusNode1.addListener(() {
-      if (mounted) {
-        setState(() {});
-      }
+      ref.read(signInEmailFocusProvider.notifier).state = focusNode1.hasFocus;
     });
     focusNode2.addListener(() {
-      if (mounted) {
-        setState(() {});
-      }
+      ref.read(signInPasswordFocusProvider.notifier).state =
+          focusNode2.hasFocus;
     });
   }
 
   @override
+  void dispose() {
+    focusNode1.dispose();
+    focusNode2.dispose();
+    email.dispose();
+    password.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final isEmailFocused = ref.watch(signInEmailFocusProvider);
+    final isPasswordFocused = ref.watch(signInPasswordFocusProvider);
+    final obscurePassword = ref.watch(signInPasswordObscuredProvider);
+
     return Scaffold(
       body: Container(
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           gradient: LinearGradient(
               begin: Alignment.topCenter,
               tileMode: TileMode.mirror,
-              colors: [
-                designBlack,
-                designGreyDark,
-                designGrey,
-                designGreyLight,
-                designWhiteGrey,
-              ],
-              transform: GradientRotation(pi / 4)),
+              colors: gradientBackground,
+              transform: const GradientRotation(pi / 4)),
         ),
         child: Center(
           child: SingleChildScrollView(
@@ -72,10 +82,23 @@ class SignInPageState extends ConsumerState<SignInPage> {
                       'assets/images/userAvatar.png',
                     ),
                     const SizedBox(height: 50),
-                    textField(email, focusNode1, 'Email', Icons.email_rounded),
+                    textField(email, focusNode1, 'Email', Icons.email_rounded,
+                        isEmailFocused),
                     const SizedBox(height: 10),
-                    textField(password, focusNode2, 'Password',
-                        Icons.password_rounded),
+                    textField(
+                      password,
+                      focusNode2,
+                      'Password',
+                      Icons.password_rounded,
+                      isPasswordFocused,
+                      isPasswordField: true,
+                      obscureText: obscurePassword,
+                      onToggleVisibility: () {
+                        final notifier =
+                            ref.read(signInPasswordObscuredProvider.notifier);
+                        notifier.state = !notifier.state;
+                      },
+                    ),
                     const SizedBox(height: 8),
                     account(),
                     const SizedBox(height: 20),
@@ -143,8 +166,16 @@ class SignInPageState extends ConsumerState<SignInPage> {
     );
   }
 
-  Widget textField(TextEditingController controller, FocusNode focusNode,
-      String typeName, IconData icon) {
+  Widget textField(
+    TextEditingController controller,
+    FocusNode focusNode,
+    String typeName,
+    IconData icon,
+    bool isFocused, {
+    bool isPasswordField = false,
+    bool obscureText = false,
+    VoidCallback? onToggleVisibility,
+  }) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 15),
       child: Container(
@@ -155,29 +186,23 @@ class SignInPageState extends ConsumerState<SignInPage> {
         child: TextField(
           controller: controller,
           focusNode: focusNode,
-          obscureText: typeName == 'Password' ? passwordVisible : false,
+          obscureText: isPasswordField ? obscureText : false,
           style: const TextStyle(
               fontSize: 17, color: Color(0xFF3E3E3E), letterSpacing: 3),
           decoration: InputDecoration(
             prefixIcon: Icon(icon,
-                color: focusNode.hasFocus
-                    ? const Color(0xFF414040)
-                    : Colors.blueGrey),
+                color: isFocused ? const Color(0xFF414040) : Colors.blueGrey),
             contentPadding:
                 const EdgeInsets.symmetric(horizontal: 15, vertical: 15),
             hintText: typeName,
-            suffixIcon: typeName == 'Password'
+            suffixIcon: isPasswordField
                 ? IconButton(
-                    icon: Icon(passwordVisible
-                        ? Icons.visibility_rounded
-                        : Icons.visibility_off_rounded),
-                    onPressed: () {
-                      if (mounted) {
-                        setState(() {
-                          passwordVisible = !passwordVisible;
-                        });
-                      }
-                    },
+                    icon: Icon(
+                      obscureText
+                          ? Icons.visibility_rounded
+                          : Icons.visibility_off_rounded,
+                    ),
+                    onPressed: onToggleVisibility,
                   )
                 : null,
             enabledBorder: OutlineInputBorder(

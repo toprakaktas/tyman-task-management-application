@@ -1,9 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/legacy.dart';
 import 'package:go_router/go_router.dart';
 import 'dart:math';
 import 'package:tyman/core/constants/colors.dart';
 import 'package:tyman/core/providers/auth_providers.dart';
+
+final signUpPasswordObscuredProvider =
+    StateProvider.autoDispose<bool>((ref) => true);
+final signUpPasswordConfirmObscuredProvider =
+    StateProvider.autoDispose<bool>((ref) => true);
+final signUpEmailFocusProvider =
+    StateProvider.autoDispose<bool>((ref) => false);
+final signUpPasswordFocusProvider =
+    StateProvider.autoDispose<bool>((ref) => false);
+final signUpPasswordConfirmFocusProvider =
+    StateProvider.autoDispose<bool>((ref) => false);
 
 class SignUpPage extends ConsumerStatefulWidget {
   const SignUpPage({super.key});
@@ -21,45 +33,51 @@ class SignUpPageState extends ConsumerState<SignUpPage> {
   final password = TextEditingController();
   final passwordConfirm = TextEditingController();
 
-  bool passwordVisible = true;
-  bool passwordConfirmVisible = true;
-
   @override
   void initState() {
     super.initState();
     focusNode1.addListener(() {
-      if (mounted) {
-        setState(() {});
-      }
+      ref.read(signUpEmailFocusProvider.notifier).state = focusNode1.hasFocus;
     });
     focusNode2.addListener(() {
-      if (mounted) {
-        setState(() {});
-      }
+      ref.read(signUpPasswordFocusProvider.notifier).state =
+          focusNode2.hasFocus;
     });
     focusNode3.addListener(() {
-      if (mounted) {
-        setState(() {});
-      }
+      ref.read(signUpPasswordConfirmFocusProvider.notifier).state =
+          focusNode3.hasFocus;
     });
   }
 
   @override
+  void dispose() {
+    focusNode1.dispose();
+    focusNode2.dispose();
+    focusNode3.dispose();
+    email.dispose();
+    password.dispose();
+    passwordConfirm.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final isEmailFocused = ref.watch(signUpEmailFocusProvider);
+    final isPasswordFocused = ref.watch(signUpPasswordFocusProvider);
+    final isPasswordConfirmFocused =
+        ref.watch(signUpPasswordConfirmFocusProvider);
+    final obscurePassword = ref.watch(signUpPasswordObscuredProvider);
+    final obscurePasswordConfirm =
+        ref.watch(signUpPasswordConfirmObscuredProvider);
+
     return Scaffold(
         body: Container(
-            decoration: const BoxDecoration(
+            decoration: BoxDecoration(
               gradient: LinearGradient(
                   begin: Alignment.topCenter,
                   tileMode: TileMode.mirror,
-                  colors: [
-                    designBlack,
-                    designGreyDark,
-                    designGrey,
-                    designGreyLight,
-                    designWhiteGrey,
-                  ],
-                  transform: GradientRotation(pi / 4)),
+                  colors: gradientBackground,
+                  transform: const GradientRotation(pi / 4)),
             ),
             child: Center(
                 child: SingleChildScrollView(
@@ -79,13 +97,38 @@ class SignUpPageState extends ConsumerState<SignUpPage> {
                     const Icon(Icons.co_present_outlined,
                         size: 60, color: Color(0xFF272525)),
                     const SizedBox(height: 50),
-                    textField(email, focusNode1, 'Email', Icons.email_rounded),
+                    textField(email, focusNode1, 'Email', Icons.email_rounded,
+                        isEmailFocused),
                     const SizedBox(height: 10),
-                    textField(password, focusNode2, 'Password',
-                        Icons.password_rounded),
+                    textField(
+                      password,
+                      focusNode2,
+                      'Password',
+                      Icons.password_rounded,
+                      isPasswordFocused,
+                      isPasswordField: true,
+                      obscureText: obscurePassword,
+                      onToggleVisibility: () {
+                        final notifier =
+                            ref.read(signUpPasswordObscuredProvider.notifier);
+                        notifier.state = !notifier.state;
+                      },
+                    ),
                     const SizedBox(height: 10),
-                    textField(passwordConfirm, focusNode3, 'Password Confirm',
-                        Icons.password_rounded),
+                    textField(
+                      passwordConfirm,
+                      focusNode3,
+                      'Password Confirm',
+                      Icons.password_rounded,
+                      isPasswordConfirmFocused,
+                      isPasswordField: true,
+                      obscureText: obscurePasswordConfirm,
+                      onToggleVisibility: () {
+                        final notifier = ref.read(
+                            signUpPasswordConfirmObscuredProvider.notifier);
+                        notifier.state = !notifier.state;
+                      },
+                    ),
                     const SizedBox(height: 8),
                     account(),
                     const SizedBox(height: 20),
@@ -150,7 +193,10 @@ class SignUpPageState extends ConsumerState<SignUpPage> {
   }
 
   Widget textField(TextEditingController controller, FocusNode focusNode,
-      String typeName, IconData icon) {
+      String typeName, IconData icon, bool isFocused,
+      {bool isPasswordField = false,
+      bool obscureText = false,
+      VoidCallback? onToggleVisibility}) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 15),
       child: Container(
@@ -161,11 +207,7 @@ class SignUpPageState extends ConsumerState<SignUpPage> {
         child: TextField(
           controller: controller,
           focusNode: focusNode,
-          obscureText: typeName == 'Password'
-              ? passwordVisible
-              : typeName == 'Password Confirm'
-                  ? passwordConfirmVisible
-                  : false,
+          obscureText: isPasswordField ? obscureText : false,
           style: const TextStyle(
               fontSize: 17,
               color: Color(0xFF3E3E3E),
@@ -173,32 +215,16 @@ class SignUpPageState extends ConsumerState<SignUpPage> {
               wordSpacing: 4),
           decoration: InputDecoration(
               prefixIcon: Icon(icon,
-                  color: focusNode.hasFocus
-                      ? const Color(0xFF414040)
-                      : Colors.blueGrey),
+                  color: isFocused ? const Color(0xFF414040) : Colors.blueGrey),
               contentPadding:
                   const EdgeInsets.symmetric(horizontal: 15, vertical: 15),
               hintText: typeName,
-              suffixIcon: typeName.contains('Password')
+              suffixIcon: isPasswordField
                   ? IconButton(
-                      icon: Icon(typeName == 'Password'
-                          ? passwordVisible
-                              ? Icons.visibility_rounded
-                              : Icons.visibility_off_rounded
-                          : passwordConfirmVisible
-                              ? Icons.visibility_rounded
-                              : Icons.visibility_off_rounded),
-                      onPressed: () {
-                        if (mounted) {
-                          setState(() {
-                            if (typeName == 'Password') {
-                              passwordVisible = !passwordVisible;
-                            } else if (typeName == 'Password Confirm') {
-                              passwordConfirmVisible = !passwordConfirmVisible;
-                            }
-                          });
-                        }
-                      },
+                      icon: Icon(obscureText
+                          ? Icons.visibility_rounded
+                          : Icons.visibility_off_rounded),
+                      onPressed: onToggleVisibility,
                     )
                   : null,
               enabledBorder: OutlineInputBorder(
