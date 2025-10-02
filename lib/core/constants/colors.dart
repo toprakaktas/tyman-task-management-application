@@ -32,4 +32,12 @@ const selectedItemColor = Color(0xFF3F75D4);
 const unselectedItemColor = Color(0xFF999999);
 const boxShadowColor = Color(0x339E9E9E);
 
+List<Color> gradientBackground = [
+  designBlack,
+  designGreyDark,
+  designGrey,
+  designGreyLight,
+  designWhiteGrey
+];
+
 //TODO: Add task title colors
