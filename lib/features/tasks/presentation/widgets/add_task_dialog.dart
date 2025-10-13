@@ -41,52 +41,56 @@ class _AddTaskDialogState extends State<AddTaskDialog> {
     await showCupertinoModalPopup(
       context: context,
       builder: (BuildContext context) {
-        return Container(
-          color: CupertinoColors.systemGrey6,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              SizedBox(
-                height: MediaQuery.of(context).size.height / 3,
-                child: CupertinoDatePicker(
-                  mode: CupertinoDatePickerMode.time,
-                  initialDateTime: DateTime.now(),
-                  onDateTimeChanged: (DateTime newTime) {
-                    tempSelectedTime = newTime;
-                  },
-                  use24hFormat: true,
-                  minuteInterval: 1,
+        return SafeArea(
+          bottom: true,
+          child: Container(
+            color: CupertinoColors.systemGrey6,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                SizedBox(
+                  height: MediaQuery.of(context).size.height / 3,
+                  child: CupertinoDatePicker(
+                    mode: CupertinoDatePickerMode.time,
+                    initialDateTime: DateTime.now(),
+                    onDateTimeChanged: (DateTime newTime) {
+                      tempSelectedTime = newTime;
+                    },
+                    use24hFormat: true,
+                    minuteInterval: 1,
+                  ),
                 ),
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  CupertinoButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 16, vertical: 10),
-                    child: const Text('Cancel',
-                        style:
-                            TextStyle(color: CupertinoColors.destructiveRed)),
-                  ),
-                  const SizedBox(width: 20),
-                  CupertinoButton(
-                    onPressed: () {
-                      setState(() {
-                        _selectedTime =
-                            TimeOfDay.fromDateTime(tempSelectedTime);
-                      });
-                      Navigator.pop(context);
-                    },
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 16, vertical: 10),
-                    child: const Text('OK', style: TextStyle(color: taskColor)),
-                  ),
-                ],
-              ),
-            ],
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    CupertinoButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 10),
+                      child: const Text('Cancel',
+                          style:
+                              TextStyle(color: CupertinoColors.destructiveRed)),
+                    ),
+                    const SizedBox(width: 20),
+                    CupertinoButton(
+                      onPressed: () {
+                        setState(() {
+                          _selectedTime =
+                              TimeOfDay.fromDateTime(tempSelectedTime);
+                        });
+                        Navigator.pop(context);
+                      },
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 10),
+                      child:
+                          const Text('OK', style: TextStyle(color: taskColor)),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
         );
       },
