@@ -95,7 +95,7 @@ class TaskService implements TaskRepository {
   }
 
   @override
-  Future<List<TaskData>> fetchTasksByCategoryAndDate(
+  Future<List<TaskData>> fetchTasksFuture(
       String category, DateTime date) async {
     DateTime start = DateTime(date.year, date.month, date.day, 0, 0);
     DateTime end = DateTime(date.year, date.month, date.day, 23, 59, 59);
@@ -125,7 +125,30 @@ class TaskService implements TaskRepository {
   }
 
   @override
-  Future<List<TaskModel>> fetchTaskCountsForCategories() async {
+  Stream<List<TaskData>> fetchTasksStream(String category, DateTime date) {
+    DateTime start = DateTime(date.year, date.month, date.day, 0, 0);
+    DateTime end = DateTime(date.year, date.month, date.day, 23, 59, 59);
+    final uid = _uid;
+    if (uid == null) {
+      return Stream<List<TaskData>>.value(<TaskData>[]);
+    }
+
+    final stream = firestore
+        .collection('users')
+        .doc(uid)
+        .collection('tasks')
+        .where('category', isEqualTo: category)
+        .where('dueDateTime', isGreaterThanOrEqualTo: start)
+        .where('dueDateTime', isLessThanOrEqualTo: end)
+        .orderBy('dueDateTime')
+        .snapshots()
+        .map((snapshot) =>
+            snapshot.docs.map((doc) => TaskData.fromFirestore(doc)).toList());
+    return stream;
+  }
+
+  @override
+  Future<List<TaskModel>> fetchTaskCounts() async {
     DateTime date = DateTime.now();
     DateTime start = DateTime(date.year, date.month, date.day, 0, 0);
     DateTime end = DateTime(date.year, date.month, date.day, 23, 59, 59);

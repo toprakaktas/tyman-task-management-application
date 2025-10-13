@@ -8,10 +8,11 @@ abstract class TaskRepository {
 
   Future<void> updateTask(TaskData task);
 
-  Future<List<TaskData>> fetchTasksByCategoryAndDate(
-      String category, DateTime date);
+  Future<List<TaskData>> fetchTasksFuture(String category, DateTime date);
+
+  Stream<List<TaskData>> fetchTasksStream(String category, DateTime date);
 
   Future<List<TaskData>> fetchTasksForToday();
 
-  Future<List<TaskModel>> fetchTaskCountsForCategories();
+  Future<List<TaskModel>> fetchTaskCounts();
 }
