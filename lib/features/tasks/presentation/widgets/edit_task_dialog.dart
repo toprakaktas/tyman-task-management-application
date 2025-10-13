@@ -126,7 +126,7 @@ class _EditTaskDialogState extends State<EditTaskDialog> {
                 ),
                 Expanded(
                   child: DropdownButtonFormField<String>(
-                    value: _category,
+                    initialValue: _category,
                     icon: const Icon(Icons.arrow_drop_down_rounded),
                     elevation: 16,
                     style: const TextStyle(

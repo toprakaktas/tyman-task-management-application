@@ -117,7 +117,7 @@ class _AddTaskDialogState extends State<AddTaskDialog> {
                   const SizedBox(width: 10),
                   Expanded(
                     child: DropdownButtonFormField<String>(
-                      value: _dropdownValue,
+                      initialValue: _dropdownValue,
                       icon: const Icon(Icons.arrow_drop_down_rounded),
                       elevation: 16,
                       style: const TextStyle(
