@@ -119,8 +119,9 @@ class MyPageState extends ConsumerState<MyPage> {
   }
 
   ImageProvider _getImageProvider(String photoUrl) {
-    if (photoUrl.isEmpty)
+    if (photoUrl.isEmpty) {
       return const AssetImage('assets/images/userAvatar.png');
+    }
     if (photoUrl.startsWith('http')) {
       return NetworkImage(photoUrl);
     } else if (photoUrl.startsWith('assets/')) {
