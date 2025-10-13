@@ -1,12 +1,12 @@
 import 'package:tyman/data/models/task_model.dart';
 import 'package:tyman/domain/services/task_repository.dart';
 
-class FetchTaskCountsForCategories {
+class FetchTaskCounts {
   final TaskRepository repository;
 
-  FetchTaskCountsForCategories(this.repository);
+  FetchTaskCounts(this.repository);
 
   Future<List<TaskModel>> call() async {
-    return await repository.fetchTaskCountsForCategories();
+    return await repository.fetchTaskCounts();
   }
 }
