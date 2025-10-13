@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:tyman/data/models/task_model.dart';
-import 'package:tyman/features/tasks/presentation/task_detail_page.dart';
+import 'package:tyman/features/tasks/presentation/task_category_page.dart';
 
 class TaskGrid extends StatelessWidget {
   final List<TaskModel> taskCategories;
@@ -26,7 +26,7 @@ class TaskGrid extends StatelessWidget {
     return GestureDetector(
       onTap: () async {
         final result = await Navigator.of(context).push(MaterialPageRoute(
-          builder: (context) => TaskDetailPage(categoryFilter: task.title),
+          builder: (context) => TaskCategoryPage(categoryFilter: task.title),
         ));
         if (result == true && onChanged != null) {
           onChanged!();
