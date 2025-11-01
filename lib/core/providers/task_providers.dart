@@ -48,12 +48,12 @@ final taskCountsProvider = FutureProvider<List<TaskModel>>((ref) async {
   return fetchTaskCounts();
 });
 
-final tasksForTodayProvider = FutureProvider<List<TaskData>>((ref) async {
+final tasksForTodayProvider = StreamProvider.autoDispose<List<TaskData>>((ref) {
   final authState = ref.watch(authStateProvider);
   if (authState.hasError) throw authState.error!;
   final user = authState.maybeWhen(data: (user) => user, orElse: () => null);
   if (user == null) {
-    return <TaskData>[];
+    return Stream<List<TaskData>>.value(<TaskData>[]);
   }
   return ref.watch(fetchTasksForTodayProvider)();
 });

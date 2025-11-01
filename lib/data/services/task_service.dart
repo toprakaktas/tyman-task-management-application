@@ -197,28 +197,27 @@ class TaskService implements TaskRepository {
   }
 
   @override
-  Future<List<TaskData>> fetchTasksForToday() async {
+  Stream<List<TaskData>> fetchTasksForToday() {
     DateTime now = DateTime.now();
     DateTime startOfDay = DateTime(now.year, now.month, now.day);
     DateTime endOfDay = DateTime(now.year, now.month, now.day, 23, 59, 59);
 
     final uid = _uid;
     if (uid == null) {
-      if (kDebugMode) {
-        print('No authenticated user.');
-      }
-      return <TaskData>[];
+      return Stream<List<TaskData>>.value(<TaskData>[]);
     }
 
-    QuerySnapshot query = await firestore
+    final stream = firestore
         .collection('users')
         .doc(uid)
         .collection('tasks')
         .where('dueDateTime', isGreaterThanOrEqualTo: startOfDay)
         .where('dueDateTime', isLessThanOrEqualTo: endOfDay)
         .orderBy('dueDateTime')
-        .get();
+        .snapshots()
+        .map((snapshot) =>
+            snapshot.docs.map((doc) => TaskData.fromFirestore(doc)).toList());
 
-    return query.docs.map((doc) => TaskData.fromFirestore(doc)).toList();
+    return stream;
   }
 }

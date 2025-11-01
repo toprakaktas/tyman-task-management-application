@@ -12,7 +12,7 @@ abstract class TaskRepository {
 
   Stream<List<TaskData>> fetchTasksStream(String category, DateTime date);
 
-  Future<List<TaskData>> fetchTasksForToday();
+  Stream<List<TaskData>> fetchTasksForToday();
 
   Future<List<TaskModel>> fetchTaskCounts();
 }

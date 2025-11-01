@@ -6,7 +6,7 @@ class FetchTasksForToday {
 
   FetchTasksForToday(this.repository);
 
-  Future<List<TaskData>> call() async {
-    return await repository.fetchTasksForToday();
+  Stream<List<TaskData>> call() {
+    return repository.fetchTasksForToday();
   }
 }
