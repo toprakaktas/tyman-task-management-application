@@ -3,7 +3,10 @@ import 'package:flutter_riverpod/legacy.dart';
 import 'package:tyman/core/providers/auth_providers.dart';
 import 'package:tyman/data/models/task_data.dart';
 import 'package:tyman/data/models/task_model.dart';
+import 'package:tyman/data/services/notification_service.dart';
 import 'package:tyman/data/services/task_service.dart';
+import 'package:tyman/domain/services/notification_repository.dart';
+import 'package:tyman/domain/usecases/notification/schedule_upcoming_tasks_notification.dart';
 import 'package:tyman/domain/usecases/task/add_task.dart';
 import 'package:tyman/domain/usecases/task/delete_task.dart';
 import 'package:tyman/domain/usecases/task/fetch_task_counts.dart';
@@ -79,4 +82,44 @@ final taskCategoryStreamProvider =
   final controller =
       ref.read(taskCategoryControllerProvider(category).notifier);
   return controller.getTasksStream(state.selectedDate, state.selectedFilter);
+});
+
+final notificationRepositoryProvider = Provider<NotificationRepository>((ref) {
+  return NotificationService();
+});
+
+final scheduleUpcomingTasksNotificationProvider =
+    Provider<ScheduleUpcomingTasksNotification>((ref) {
+  return ScheduleUpcomingTasksNotification(
+    ref.watch(notificationRepositoryProvider),
+  );
+});
+
+final upcomingTasksNotificationProvider = Provider<void>((ref) {
+  final scheduleNotification =
+      ref.watch(scheduleUpcomingTasksNotificationProvider);
+
+  ref.listen(tasksForTodayProvider, (previous, next) {
+    next.whenData((tasks) {
+      final incompleteTasks = tasks.where((task) => !task.completed).toList();
+      final taskCount = incompleteTasks.length;
+
+      scheduleNotification.call(taskCount: taskCount);
+    });
+  });
+});
+
+final taskNotificationListenerProvider = Provider.autoDispose<void>((ref) {
+  final tasksAsync = ref.watch(tasksForTodayProvider);
+  final scheduleNotification =
+      ref.watch(scheduleUpcomingTasksNotificationProvider);
+
+  tasksAsync.whenData((tasks) {
+    final incompleteTasks = tasks.where((task) => !task.completed).length;
+    scheduleNotification(
+      taskCount: incompleteTasks,
+      hour: 9,
+      minute: 0,
+    );
+  });
 });

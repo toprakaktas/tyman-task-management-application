@@ -21,6 +21,7 @@ class HomePage extends ConsumerStatefulWidget {
 class _HomePageState extends ConsumerState<HomePage> {
   @override
   Widget build(BuildContext context) {
+    ref.watch(taskNotificationListenerProvider);
     final AsyncValue<List<TaskModel>> taskCategories =
         ref.watch(taskCountsProvider);
     final AppUser? appUser = ref.watch(userProfileProvider).value;

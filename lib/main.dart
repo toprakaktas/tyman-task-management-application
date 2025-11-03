@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:tyman/core/notifications/notifications.dart';
 import 'package:tyman/core/providers/router_provider.dart';
 import 'package:tyman/firebase/firebase_options.dart';
 import 'package:intl/date_symbol_data_local.dart';
@@ -11,6 +12,7 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load(fileName: ".env");
   final apiKey = dotenv.env['API_KEY'];
+  await Notifications().initNotification();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   initializeDateFormatting()
       .then((_) => runApp(ProviderScope(child: MyApp(apiKey: apiKey))));
