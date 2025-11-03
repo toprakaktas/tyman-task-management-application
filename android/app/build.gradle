@@ -78,9 +78,9 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation 'com.android.support:multidex:1.0.3'
      // Import the BoM for the Firebase platform
-    implementation(platform("com.google.firebase:firebase-bom:34.3.0"))
+    implementation(platform("com.google.firebase:firebase-bom:34.5.0"))
     implementation 'com.google.firebase:firebase-auth:24.0.1'
-    implementation 'com.google.firebase:firebase-firestore:26.0.1'
+    implementation 'com.google.firebase:firebase-firestore:26.0.2'
     implementation 'com.google.android.gms:play-services-auth:21.4.0'
     implementation 'com.google.android.gms:play-services-base:18.9.0'
     implementation 'com.google.android.gms:play-services-tasks:18.4.0'
