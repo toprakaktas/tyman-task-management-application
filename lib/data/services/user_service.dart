@@ -74,8 +74,7 @@ class UserService implements UserRepository {
   @override
   Future<String> uploadProfileImage(File file) async {
     final uid = auth.currentUser!.uid;
-    final fileExtension = file.path.split('.').last.toLowerCase();
-    final ref = storage.ref().child('avatars/$uid/profile.$fileExtension');
+    final ref = storage.ref().child('avatars/$uid/profile.jpg');
 
     UploadTask uploadTask = ref.putFile(file);
     TaskSnapshot snapshot = await uploadTask;

@@ -6,8 +6,10 @@ import 'package:image_picker/image_picker.dart';
 import 'package:tyman/core/providers/auth_providers.dart';
 import 'package:tyman/core/providers/task_providers.dart';
 import 'package:tyman/core/providers/user_provider.dart';
+import 'package:tyman/core/utils/image_utils.dart';
 import 'package:tyman/core/utils/snackbar_helper.dart';
 import 'package:tyman/core/widgets/app_bottom_nav_bar.dart';
+import 'package:tyman/core/widgets/cached_user_avatar.dart';
 import 'package:tyman/core/widgets/custom_text_field.dart';
 import 'dart:io';
 import 'package:tyman/core/constants/colors.dart';
@@ -58,9 +60,16 @@ class MyPageState extends ConsumerState<MyPage> {
     final file = File(picked.path);
 
     try {
+      final compressedFile = await compressImage(file);
+
       final uploadProfileImage = ref.read(uploadProfileImageProvider);
       final updateProfile = ref.read(updateProfileProvider);
-      final downloadUrl = await uploadProfileImage(file);
+      final downloadUrl = await uploadProfileImage(compressedFile);
+
+      try {
+        await compressedFile.delete();
+      } catch (_) {}
+
       await updateProfile(
         appUser,
         nameController.text,
@@ -73,7 +82,9 @@ class MyPageState extends ConsumerState<MyPage> {
         showSnackBar(context, 'Profile picture updated successfully');
       }
     } catch (e) {
-      if (mounted) showSnackBar(context, 'Upload failed: $e');
+      if (mounted) {
+        showSnackBar(context, 'Upload failed: $e');
+      }
       return;
     }
   }
@@ -116,23 +127,6 @@ class MyPageState extends ConsumerState<MyPage> {
     try {
       await ref.read(userProfileProvider.future);
     } catch (_) {}
-  }
-
-  ImageProvider _getImageProvider(String photoUrl) {
-    if (photoUrl.isEmpty) {
-      return const AssetImage('assets/images/userAvatar.png');
-    }
-    if (photoUrl.startsWith('http')) {
-      return NetworkImage(photoUrl);
-    } else if (photoUrl.startsWith('assets/')) {
-      return AssetImage(photoUrl);
-    } else {
-      try {
-        final file = File(photoUrl);
-        if (file.existsSync() && file.lengthSync() > 0) return FileImage(file);
-      } catch (_) {}
-      return const AssetImage('assets/images/userAvatar.png');
-    }
   }
 
   @override
@@ -208,11 +202,7 @@ class MyPageState extends ConsumerState<MyPage> {
               onTap: () => _pickImage(appUser),
               child: Stack(
                 children: [
-                  CircleAvatar(
-                    radius: 60,
-                    backgroundImage: _getImageProvider(appUser.photo),
-                    backgroundColor: Colors.transparent,
-                  ),
+                  CachedUserAvatar(photoUrl: appUser.photo, size: 135),
                   Positioned(
                     bottom: 0,
                     right: 0,
