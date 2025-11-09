@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/cupertino.dart';
 
 const Color cardYellowLight = Color(0xFFFFF7EC);
@@ -39,5 +41,13 @@ List<Color> gradientBackground = [
   designGreyLight,
   designWhiteGrey
 ];
+
+class BackgroundDecoration {
+  static final LinearGradient decoration = LinearGradient(
+      begin: Alignment.topCenter,
+      tileMode: TileMode.mirror,
+      colors: gradientBackground,
+      transform: const GradientRotation(pi / 4));
+}
 
 //TODO: Add task title colors

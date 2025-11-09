@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:go_router/go_router.dart';
-import 'dart:math';
 import 'package:tyman/core/constants/colors.dart';
 import 'package:tyman/core/providers/auth_providers.dart';
 
@@ -56,13 +55,7 @@ class SignInPageState extends ConsumerState<SignInPage> {
 
     return Scaffold(
       body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              tileMode: TileMode.mirror,
-              colors: gradientBackground,
-              transform: const GradientRotation(pi / 4)),
-        ),
+        decoration: BoxDecoration(gradient: BackgroundDecoration.decoration),
         child: Center(
           child: SingleChildScrollView(
             child: Card(

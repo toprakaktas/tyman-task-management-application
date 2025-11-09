@@ -1,4 +1,3 @@
-import 'dart:math';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -154,19 +153,8 @@ class MyPageState extends ConsumerState<MyPage> {
         }
 
         return Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              tileMode: TileMode.mirror,
-              colors: [
-                designBlack,
-                designGreyDark,
-                designGrey,
-                designGreyLight,
-                designWhiteGrey,
-              ],
-              transform: GradientRotation(pi / 4),
-            ),
+          decoration: BoxDecoration(
+            gradient: BackgroundDecoration.decoration,
           ),
           child: Scaffold(
             backgroundColor: Colors.transparent,

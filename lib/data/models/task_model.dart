@@ -32,17 +32,17 @@ class TaskModel {
       : this(
             title: 'Work',
             iconData: Icons.cases_rounded,
-            bgColor: cardRedLight,
-            iconColor: kRedDark,
-            btnColor: cardRed);
+            bgColor: cardBlueLight,
+            iconColor: cardBlueDark,
+            btnColor: cardBlue);
 
   TaskModel.health()
       : this(
             title: 'Health',
             iconData: Icons.favorite_rounded,
-            bgColor: cardBlueLight,
-            iconColor: cardBlueDark,
-            btnColor: cardBlue);
+            bgColor: cardRedLight,
+            iconColor: kRedDark,
+            btnColor: cardRed);
 
   TaskModel.other()
       : this(
