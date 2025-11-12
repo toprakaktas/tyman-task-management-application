@@ -5,6 +5,8 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tyman/core/notifications/notifications.dart';
 import 'package:tyman/core/providers/router_provider.dart';
+import 'package:tyman/core/themes/dark_theme.dart';
+import 'package:tyman/core/themes/light.theme.dart';
 import 'package:tyman/firebase/firebase_options.dart';
 import 'package:intl/date_symbol_data_local.dart';
 
@@ -28,6 +30,8 @@ class MyApp extends ConsumerWidget {
         const SystemUiOverlayStyle(statusBarColor: Colors.transparent));
     final router = ref.watch(routerProvider);
     return MaterialApp.router(
+      theme: lightTheme,
+      darkTheme: darkTheme,
       debugShowCheckedModeBanner: false,
       title: 'TyMan',
       routerConfig: router,

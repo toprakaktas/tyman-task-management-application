@@ -27,7 +27,7 @@ class _HomePageState extends ConsumerState<HomePage> {
     final AppUser? appUser = ref.watch(userProfileProvider).value;
 
     return Scaffold(
-        backgroundColor: Colors.white,
+        backgroundColor: Theme.of(context).colorScheme.surface,
         appBar: HomeAppBar(user: appUser),
         body: taskCategories.when(
           data: (tasks) => RefreshIndicator(
