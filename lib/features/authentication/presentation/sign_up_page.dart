@@ -71,17 +71,16 @@ class SignUpPageState extends ConsumerState<SignUpPage> {
 
     return Scaffold(
         body: Container(
-            decoration:
-                BoxDecoration(gradient: BackgroundDecoration.decoration),
+            decoration: BoxDecoration(
+                gradient: BackgroundDecoration.getGradient(context)),
             child: Center(
                 child: SingleChildScrollView(
                     child: Card(
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(45),
               ),
-              color: const Color(0xFF717171),
-              shadowColor: const Color(0xFF484848),
-              surfaceTintColor: const Color(0xFF2C2C2C),
+              color: Theme.of(context).cardColor,
+              shadowColor: Theme.of(context).shadowColor,
               elevation: 15,
               child: Padding(
                 padding: const EdgeInsets.all(25),
