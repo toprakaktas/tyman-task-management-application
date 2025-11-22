@@ -3,8 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tyman/core/notifications/notifications.dart';
 import 'package:tyman/core/providers/router_provider.dart';
+import 'package:tyman/core/providers/theme_provider.dart';
 import 'package:tyman/core/themes/dark_theme.dart';
 import 'package:tyman/core/themes/light.theme.dart';
 import 'package:tyman/firebase/firebase_options.dart';
@@ -13,11 +15,13 @@ import 'package:intl/date_symbol_data_local.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load(fileName: ".env");
+  final prefs = await SharedPreferences.getInstance();
   final apiKey = dotenv.env['API_KEY'];
   await Notifications().initNotification();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  initializeDateFormatting()
-      .then((_) => runApp(ProviderScope(child: MyApp(apiKey: apiKey))));
+  initializeDateFormatting().then((_) => runApp(ProviderScope(overrides: [
+        sharedPreferencesProvider.overrideWithValue(prefs),
+      ], child: MyApp(apiKey: apiKey))));
 }
 
 class MyApp extends ConsumerWidget {
@@ -29,9 +33,12 @@ class MyApp extends ConsumerWidget {
     SystemChrome.setSystemUIOverlayStyle(
         const SystemUiOverlayStyle(statusBarColor: Colors.transparent));
     final router = ref.watch(routerProvider);
+    final themeMode = ref.watch(themeNotifierProvider);
+
     return MaterialApp.router(
       theme: lightTheme,
       darkTheme: darkTheme,
+      themeMode: themeMode,
       debugShowCheckedModeBanner: false,
       title: 'TyMan',
       routerConfig: router,
