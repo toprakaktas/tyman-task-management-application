@@ -52,20 +52,28 @@ class TaskGrid extends StatelessWidget {
               FittedBox(
                 child: Text(
                   task.title,
-                  style: const TextStyle(
-                      fontSize: 18, fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: task.iconColor.withValues(
+                        red: task.iconColor.r + 66,
+                        green: task.iconColor.g + 66,
+                        blue: task.iconColor.b + 66,
+                      )),
                 ),
               ),
               const SizedBox(height: 25),
               Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   _buildStatusChip(
+                    context,
                     task.btnColor,
                     task.iconColor,
                     '${task.left} left',
                   ),
-                  const SizedBox(width: 5),
                   _buildStatusChip(
+                    context,
                     Colors.white,
                     task.iconColor,
                     '${task.done} done',
@@ -79,14 +87,17 @@ class TaskGrid extends StatelessWidget {
     );
   }
 
-  Widget _buildStatusChip(Color bgColor, Color txtColor, String label) {
+  Widget _buildStatusChip(
+      BuildContext context, Color bgColor, Color txtColor, String label) {
+    final theme = Theme.of(context);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       decoration: BoxDecoration(
           color: bgColor, borderRadius: BorderRadius.circular(20)),
       child: Text(
         label,
-        style: TextStyle(color: txtColor),
+        style: TextStyle(
+            color: txtColor, fontSize: theme.textTheme.labelLarge!.fontSize),
       ),
     );
   }
