@@ -22,12 +22,23 @@ class _AddTaskDialogState extends State<AddTaskDialog> {
   String _dropdownValue = 'Personal';
 
   Future<void> _selectDate(BuildContext context) async {
+    final theme = Theme.of(context);
     final DateTime? picked = await showDatePicker(
-      context: context,
-      initialDate: _selectedDate,
-      firstDate: DateTime.now(),
-      lastDate: DateTime(2101),
-    );
+        context: context,
+        initialDate: _selectedDate,
+        firstDate: DateTime.now(),
+        lastDate: DateTime(2101),
+        builder: (context, child) {
+          return Theme(
+              data: theme.copyWith(
+                  cardTheme: theme.cardTheme,
+                  textTheme: theme.textTheme,
+                  colorScheme: theme.colorScheme,
+                  brightness: theme.brightness,
+                  iconButtonTheme: theme.iconButtonTheme,
+                  unselectedWidgetColor: theme.unselectedWidgetColor),
+              child: child!);
+        });
     if (picked != null && picked != _selectedDate) {
       setState(() {
         _selectedDate = picked;
@@ -37,14 +48,14 @@ class _AddTaskDialogState extends State<AddTaskDialog> {
 
   Future<void> _selectTime(BuildContext context) async {
     DateTime tempSelectedTime = DateTime.now();
-
+    final theme = Theme.of(context);
     await showCupertinoModalPopup(
       context: context,
       builder: (BuildContext context) {
         return SafeArea(
           bottom: true,
           child: Container(
-            color: CupertinoColors.systemGrey6,
+            color: theme.colorScheme.secondary,
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
@@ -70,8 +81,7 @@ class _AddTaskDialogState extends State<AddTaskDialog> {
                       padding: const EdgeInsets.symmetric(
                           horizontal: 16, vertical: 10),
                       child: const Text('Cancel',
-                          style:
-                              TextStyle(color: CupertinoColors.destructiveRed)),
+                          style: TextStyle(color: deleteTaskColor)),
                     ),
                     const SizedBox(width: 20),
                     CupertinoButton(
@@ -99,14 +109,15 @@ class _AddTaskDialogState extends State<AddTaskDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return AlertDialog(
-      title: const Row(
+      title: Row(
         children: [
           Icon(CupertinoIcons.add_circled, color: taskColor),
           SizedBox(width: 10),
           Text(
             'Add New Task',
-            style: TextStyle(color: CupertinoColors.darkBackgroundGray),
+            style: TextStyle(color: theme.textTheme.bodyLarge!.color),
           ),
         ],
       ),
@@ -121,15 +132,19 @@ class _AddTaskDialogState extends State<AddTaskDialog> {
                   const SizedBox(width: 10),
                   Expanded(
                     child: DropdownButtonFormField<String>(
+                      borderRadius: BorderRadius.circular(25),
+                      autovalidateMode: AutovalidateMode.onUserInteraction,
+                      menuMaxHeight: kMinInteractiveDimension * 4.4,
+                      itemHeight: kMinInteractiveDimension,
                       initialValue: _dropdownValue,
+                      enableFeedback: true,
                       icon: const Icon(Icons.arrow_drop_down_rounded),
                       elevation: 16,
-                      style: const TextStyle(
-                          color: CupertinoColors.darkBackgroundGray),
+                      style: TextStyle(color: theme.textTheme.bodyLarge!.color),
                       decoration: InputDecoration(
                         labelText: 'Category',
-                        labelStyle: const TextStyle(
-                            color: CupertinoColors.darkBackgroundGray),
+                        labelStyle:
+                            TextStyle(color: theme.textTheme.bodyLarge!.color),
                         enabledBorder: OutlineInputBorder(
                           borderSide: const BorderSide(color: Colors.grey),
                           borderRadius: BorderRadius.circular(10),
@@ -139,7 +154,7 @@ class _AddTaskDialogState extends State<AddTaskDialog> {
                           borderRadius: BorderRadius.circular(10),
                         ),
                         contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 15, vertical: 10),
+                            horizontal: 13, vertical: 10),
                       ),
                       onChanged: (String? newValue) {
                         setState(() {
@@ -167,11 +182,27 @@ class _AddTaskDialogState extends State<AddTaskDialog> {
                   const SizedBox(width: 10),
                   Expanded(
                     child: TextField(
+                      onTapOutside: (_) => FocusScope.of(context).unfocus(),
+                      cursorOpacityAnimates: true,
+                      style: TextStyle(
+                          color: theme.textTheme.labelLarge!.color,
+                          fontWeight: theme.textTheme.labelLarge!.fontWeight,
+                          fontSize: theme.textTheme.labelLarge!.fontSize),
+                      cursorHeight: 20,
+                      minLines: 1,
+                      maxLines: 2,
                       controller: _descriptionController,
-                      decoration: const InputDecoration(
+                      decoration: InputDecoration(
+                        isDense: true,
+                        floatingLabelStyle: TextStyle(
+                          color: theme.textTheme.bodyLarge!.color,
+                        ),
                         labelText: 'Description',
                         labelStyle: TextStyle(
-                            color: CupertinoColors.darkBackgroundGray),
+                          color: theme.textTheme.labelLarge!.color,
+                          fontWeight: theme.textTheme.labelLarge!.fontWeight,
+                          fontSize: theme.textTheme.labelLarge!.fontSize,
+                        ),
                         enabledBorder: OutlineInputBorder(
                           borderSide: BorderSide(color: Colors.grey),
                           borderRadius: BorderRadius.all(Radius.circular(10)),
@@ -188,6 +219,7 @@ class _AddTaskDialogState extends State<AddTaskDialog> {
             ),
             const SizedBox(height: 10),
             ListTile(
+              titleAlignment: ListTileTitleAlignment.center,
               contentPadding: const EdgeInsets.symmetric(horizontal: 0),
               leading: const Icon(
                 CupertinoIcons.calendar_today,
@@ -195,8 +227,11 @@ class _AddTaskDialogState extends State<AddTaskDialog> {
               ),
               title: Text(
                 "Due Date: ${DateFormat('dd/MM/yy').format(_selectedDate)}",
-                style:
-                    const TextStyle(color: CupertinoColors.darkBackgroundGray),
+                style: TextStyle(
+                  color: theme.textTheme.labelLarge!.color,
+                  fontWeight: theme.textTheme.labelLarge!.fontWeight,
+                  fontSize: theme.textTheme.labelLarge!.fontSize,
+                ),
               ),
               trailing: const Icon(Icons.keyboard_arrow_down),
               onTap: () => _selectDate(context),
@@ -205,7 +240,13 @@ class _AddTaskDialogState extends State<AddTaskDialog> {
               contentPadding: const EdgeInsets.symmetric(horizontal: 0),
               leading: const Icon(CupertinoIcons.time, color: taskColor),
               title: Text(
-                  "Due Time: ${_selectedTime.hour}:${_selectedTime.minute.toString().padLeft(2, '0')}"),
+                "Due Time: ${_selectedTime.hour}:${_selectedTime.minute.toString().padLeft(2, '0')}",
+                style: TextStyle(
+                  color: theme.textTheme.labelLarge!.color,
+                  fontWeight: theme.textTheme.labelLarge!.fontWeight,
+                  fontSize: theme.textTheme.labelLarge!.fontSize,
+                ),
+              ),
               trailing: const Icon(Icons.keyboard_arrow_down),
               onTap: () => _selectTime(context),
             ),
@@ -248,11 +289,11 @@ class _AddTaskDialogState extends State<AddTaskDialog> {
           },
           child: const Text(
             'Add Task',
-            style: TextStyle(color: taskColor),
+            style: TextStyle(color: taskColor, fontWeight: FontWeight.bold),
           ),
         ),
       ],
-      backgroundColor: Colors.grey[200],
+      backgroundColor: theme.colorScheme.secondary,
       shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.all(Radius.circular(20))),
     );
