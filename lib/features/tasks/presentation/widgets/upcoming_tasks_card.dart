@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:tyman/features/tasks/presentation/upcoming_tasks_page.dart';
+import 'package:go_router/go_router.dart';
 
 class UpcomingTasksCard extends StatelessWidget {
   const UpcomingTasksCard({super.key});
@@ -8,11 +8,7 @@ class UpcomingTasksCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (_) => UpcomingTasksPage(),
-            ));
+        context.go('/upcoming');
       },
       child: Stack(
         children: [
@@ -22,7 +18,7 @@ class UpcomingTasksCard extends StatelessWidget {
             decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(20), color: Colors.black),
             child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Container(
                     padding: const EdgeInsets.all(5),

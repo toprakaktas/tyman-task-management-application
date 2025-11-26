@@ -1,6 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:tyman/core/providers/task_providers.dart';
 import 'package:tyman/core/widgets/task_card.dart';
 
@@ -10,17 +12,21 @@ class UpcomingTasksPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final tasks = ref.watch(tasksForTodayProvider);
+    final theme = Theme.of(context);
 
     return Scaffold(
         appBar: AppBar(
-          title: const Text(
+          title: Text(
             'Upcoming Tasks',
-            style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
+            style: TextStyle(
+                fontSize: 25,
+                fontWeight: FontWeight.bold,
+                color: theme.textTheme.bodyLarge!.color),
           ),
           leading: IconButton(
             icon: const Icon(CupertinoIcons.back),
             onPressed: () {
-              Navigator.of(context).pop();
+              context.go('/home');
             },
           ),
         ),
@@ -29,7 +35,24 @@ class UpcomingTasksPage extends ConsumerWidget {
             child: tasks.when(
               data: (data) {
                 if (data.isEmpty) {
-                  return const Center(child: Text('No tasks for today!'));
+                  return Animate(
+                      child: Center(
+                          child: Text('No tasks for today!',
+                                  style: TextStyle(
+                                      fontSize:
+                                          theme.textTheme.bodyLarge!.fontSize,
+                                      fontWeight:
+                                          theme.textTheme.bodyLarge!.fontWeight,
+                                      color: theme.textTheme.bodyLarge!.color))
+                              .animate(
+                                  onPlay: (controller) =>
+                                      controller.repeat(reverse: true))
+                              .shake(
+                                  rotation: 0.2,
+                                  duration: 1.seconds,
+                                  hz: 2,
+                                  curve: Curves.easeInOutCirc,
+                                  delay: 1.seconds)));
                 }
                 return ListView.builder(
                   itemCount: data.length,
