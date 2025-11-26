@@ -148,8 +148,8 @@ class _HomeAppBarState extends ConsumerState<HomeAppBar> {
           const SizedBox(width: 10),
           Text(
             "Hello, ${widget.user?.name ?? 'Earthling'}!",
-            style: const TextStyle(
-              color: Colors.black,
+            style: TextStyle(
+              color: theme.textTheme.bodyLarge!.color,
               fontSize: 26,
               fontWeight: FontWeight.bold,
             ),
