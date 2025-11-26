@@ -7,6 +7,7 @@ import 'package:tyman/features/authentication/presentation/sign_in_page.dart';
 import 'package:tyman/features/authentication/presentation/sign_up_page.dart';
 import 'package:tyman/features/tasks/presentation/home_page.dart';
 import 'package:tyman/features/profile/presentation/my_page.dart';
+import 'package:tyman/features/tasks/presentation/upcoming_tasks_page.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
   return GoRouter(
@@ -36,6 +37,10 @@ final routerProvider = Provider<GoRouter>((ref) {
         name: 'profile',
         builder: (context, state) => const MyPage(),
       ),
+      GoRoute(
+          path: '/upcoming',
+          name: 'upcoming page',
+          builder: (context, state) => const UpcomingTasksPage())
     ],
     redirect: (context, state) {
       final user = FirebaseAuth.instance.currentUser;
