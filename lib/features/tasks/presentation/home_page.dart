@@ -25,9 +25,9 @@ class _HomePageState extends ConsumerState<HomePage> {
     final AsyncValue<List<TaskModel>> taskCategories =
         ref.watch(taskCountsProvider);
     final AppUser? appUser = ref.watch(userProfileProvider).value;
-
+    final theme = Theme.of(context);
     return Scaffold(
-        backgroundColor: Theme.of(context).colorScheme.surface,
+        backgroundColor: theme.colorScheme.surface,
         appBar: HomeAppBar(user: appUser),
         body: taskCategories.when(
           data: (tasks) => RefreshIndicator(
@@ -73,7 +73,7 @@ class _HomePageState extends ConsumerState<HomePage> {
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
           elevation: 0,
-          backgroundColor: Colors.black,
+          backgroundColor: theme.floatingActionButtonTheme.backgroundColor,
           onPressed: () => showDialog(
               context: context,
               builder: (_) => AddTaskDialog(
