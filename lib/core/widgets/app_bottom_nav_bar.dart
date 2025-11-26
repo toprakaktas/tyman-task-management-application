@@ -9,6 +9,7 @@ class AppBottomNavBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Container(
       decoration: BoxDecoration(
         borderRadius: const BorderRadius.only(
@@ -25,7 +26,9 @@ class AppBottomNavBar extends StatelessWidget {
           topRight: Radius.circular(30),
         ),
         child: BottomNavigationBar(
-          backgroundColor: Colors.white,
+          backgroundColor: theme.bottomNavigationBarTheme.backgroundColor,
+          type: BottomNavigationBarType.fixed,
+          enableFeedback: true,
           showSelectedLabels: true,
           showUnselectedLabels: true,
           selectedItemColor: selectedItemColor,
