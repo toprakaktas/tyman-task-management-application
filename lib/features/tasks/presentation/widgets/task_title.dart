@@ -12,39 +12,57 @@ class TaskTitle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Container(
       padding: const EdgeInsets.all(15),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          const Text(
+          Text(
             'Tasks',
-            style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+            style: TextStyle(
+                fontSize: 22,
+                color: theme.textTheme.bodyMedium?.color,
+                fontWeight: theme.textTheme.bodyLarge?.fontWeight),
           ),
           Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-                color: Colors.grey.withValues(alpha: 0.30),
+                border: Border.all(
+                    color: theme.colorScheme.tertiary,
+                    width: 1,
+                    strokeAlign: BorderSide.strokeAlignCenter),
+                color: theme.colorScheme.surface,
                 borderRadius: BorderRadius.circular(25)),
             child: PopupMenuButton<TaskFilter>(
+              padding: EdgeInsets.zero,
+              enableFeedback: true,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20)),
               onSelected: onFilterSelected,
               itemBuilder: (context) => <PopupMenuEntry<TaskFilter>>[
                 PopupMenuItem<TaskFilter>(
                   value: TaskFilter.time,
-                  child: Text(TaskFilter.time.label),
+                  child: Text(TaskFilter.time.label,
+                      style: TextStyle(
+                          color: theme.textTheme.bodyMedium?.color,
+                          fontWeight: theme.textTheme.bodyMedium?.fontWeight)),
                 ),
                 PopupMenuItem<TaskFilter>(
                   value: TaskFilter.description,
-                  child: Text(TaskFilter.description.label),
+                  child: Text(TaskFilter.description.label,
+                      style: TextStyle(
+                          color: theme.textTheme.bodyMedium?.color,
+                          fontWeight: theme.textTheme.bodyMedium?.fontWeight)),
                 ),
               ],
               child: Row(
                 children: [
-                  Text(
-                    selectedFilter.label,
-                    style: TextStyle(
-                        color: Colors.grey[800], fontWeight: FontWeight.bold),
-                  ),
+                  Text(selectedFilter.label,
+                      style: TextStyle(
+                          color: theme.textTheme.bodyLarge?.color,
+                          fontWeight: theme.textTheme.bodyLarge?.fontWeight,
+                          fontSize: 16)),
                   const Icon(Icons.keyboard_arrow_down_rounded)
                 ],
               ),
