@@ -148,52 +148,57 @@ class TaskService implements TaskRepository {
   }
 
   @override
-  Future<List<TaskModel>> fetchTaskCounts() async {
-    DateTime date = DateTime.now();
-    DateTime start = DateTime(date.year, date.month, date.day, 0, 0);
-    DateTime end = DateTime(date.year, date.month, date.day, 23, 59, 59);
-    List<TaskModel> taskCategories = [
-      TaskModel.personal(),
-      TaskModel.work(),
-      TaskModel.health(),
-      TaskModel.other()
-    ];
-
+  Stream<List<TaskModel>> fetchTaskCounts() {
     final uid = _uid;
     if (uid == null) {
       if (kDebugMode) {
         print('No authenticated user.');
       }
-      return <TaskModel>[];
+      return Stream.value(<TaskModel>[]);
     }
 
-    for (var taskCategory in taskCategories) {
-      QuerySnapshot snapshot = await firestore
-          .collection('users')
-          .doc(uid)
-          .collection('tasks')
-          .where('category', isEqualTo: taskCategory.title)
-          .where('dueDateTime', isGreaterThanOrEqualTo: start)
-          .where('dueDateTime', isLessThanOrEqualTo: end)
-          .get();
+    DateTime date = DateTime.now();
+    DateTime start = DateTime(date.year, date.month, date.day, 0, 0);
+    DateTime end = DateTime(date.year, date.month, date.day, 23, 59, 59);
 
-      int leftCount = 0;
-      int doneCount = 0;
+    return firestore
+        .collection('users')
+        .doc(uid)
+        .collection('tasks')
+        .where('dueDateTime', isGreaterThanOrEqualTo: start)
+        .where('dueDateTime', isLessThanOrEqualTo: end)
+        .snapshots()
+        .map((snapshot) {
+      List<TaskModel> taskCategories = [
+        TaskModel.personal(),
+        TaskModel.work(),
+        TaskModel.health(),
+        TaskModel.other()
+      ];
 
       for (var doc in snapshot.docs) {
-        bool completed =
-            (doc.data() as Map<String, dynamic>)['completed'] ?? false;
-        if (completed == false) {
-          leftCount++;
-        } else if (completed == true) {
-          doneCount++;
+        final data = doc.data();
+        final String categoryTitle = data['category'] ?? '';
+        final bool completed = data['completed'] ?? false;
+
+        try {
+          final targetCategory = taskCategories.firstWhere(
+            (c) => c.title == categoryTitle,
+          );
+
+          if (completed) {
+            targetCategory.done++;
+          } else {
+            targetCategory.left++;
+          }
+        } catch (e) {
+          if (kDebugMode) {
+            print('$e');
+          }
         }
       }
-
-      taskCategory.left = leftCount;
-      taskCategory.done = doneCount;
-    }
-    return taskCategories;
+      return taskCategories;
+    });
   }
 
   @override

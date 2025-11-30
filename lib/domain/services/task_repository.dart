@@ -14,5 +14,5 @@ abstract class TaskRepository {
 
   Stream<List<TaskData>> fetchTasksForToday();
 
-  Future<List<TaskModel>> fetchTaskCounts();
+  Stream<List<TaskModel>> fetchTaskCounts();
 }

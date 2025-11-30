@@ -40,12 +40,12 @@ final deleteTaskProvider =
 final fetchTasksForTodayProvider = Provider<FetchTasksForToday>(
     (ref) => FetchTasksForToday(ref.watch(taskServiceProvider)));
 
-final taskCountsProvider = FutureProvider<List<TaskModel>>((ref) async {
+final taskCountsProvider = StreamProvider<List<TaskModel>>((ref) {
   final authState = ref.watch(authStateProvider);
-  if (authState.hasError) throw authState.error!;
-  final user = authState.maybeWhen(data: (user) => user, orElse: () => null);
+  if (authState.hasError) Stream.error(authState.error!);
+  final user = authState.value;
   if (user == null) {
-    return <TaskModel>[];
+    return Stream.value(<TaskModel>[]);
   }
   final fetchTaskCounts = ref.watch(fetchTaskCountsForCategoriesProvider);
   return fetchTaskCounts();

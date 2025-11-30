@@ -6,7 +6,7 @@ class FetchTaskCounts {
 
   FetchTaskCounts(this.repository);
 
-  Future<List<TaskModel>> call() async {
-    return await repository.fetchTaskCounts();
+  Stream<List<TaskModel>> call() {
+    return repository.fetchTaskCounts();
   }
 }
