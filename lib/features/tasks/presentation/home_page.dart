@@ -8,24 +8,18 @@ import 'package:tyman/data/models/app_user.dart';
 import 'package:tyman/features/tasks/presentation/widgets/add_task_dialog.dart';
 import 'package:tyman/features/tasks/presentation/widgets/home_app_bar.dart';
 import 'package:tyman/features/tasks/presentation/widgets/task_grid.dart';
-import 'package:tyman/data/models/task_model.dart';
 import 'package:tyman/features/tasks/presentation/widgets/upcoming_tasks_card.dart';
 
-class HomePage extends ConsumerStatefulWidget {
+class HomePage extends ConsumerWidget {
   const HomePage({super.key});
 
   @override
-  ConsumerState<HomePage> createState() => _HomePageState();
-}
-
-class _HomePageState extends ConsumerState<HomePage> {
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     ref.watch(taskNotificationListenerProvider);
-    final AsyncValue<List<TaskModel>> taskCategories =
-        ref.watch(taskCountsProvider);
+    final taskCategories = ref.watch(taskCountsProvider);
     final AppUser? appUser = ref.watch(userProfileProvider).value;
     final theme = Theme.of(context);
+
     return Scaffold(
         backgroundColor: theme.colorScheme.surface,
         appBar: HomeAppBar(user: appUser),
@@ -49,10 +43,6 @@ class _HomePageState extends ConsumerState<HomePage> {
                 Expanded(
                     child: TaskGrid(
                   taskCategories: tasks,
-                  onChanged: () {
-                    ref.invalidate(taskCountsProvider);
-                    ref.read(taskCountsProvider.future);
-                  },
                 )),
               ],
             ),
