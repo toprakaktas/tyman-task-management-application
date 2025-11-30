@@ -4,9 +4,8 @@ import 'package:tyman/features/tasks/presentation/task_category_page.dart';
 
 class TaskGrid extends StatelessWidget {
   final List<TaskModel> taskCategories;
-  final VoidCallback? onChanged;
 
-  const TaskGrid({super.key, required this.taskCategories, this.onChanged});
+  const TaskGrid({super.key, required this.taskCategories});
 
   @override
   Widget build(BuildContext context) {
@@ -25,12 +24,9 @@ class TaskGrid extends StatelessWidget {
   Widget _buildTaskCard(BuildContext context, TaskModel task) {
     return GestureDetector(
       onTap: () async {
-        final result = await Navigator.of(context).push(MaterialPageRoute(
-          builder: (context) => TaskCategoryPage(categoryFilter: task.title),
-        ));
-        if (result == true && onChanged != null) {
-          onChanged!();
-        }
+        await Navigator.of(context).push(MaterialPageRoute(
+            builder: (context) =>
+                TaskCategoryPage(categoryFilter: task.title)));
       },
       child: Card(
         elevation: 3.0, // Shadow
