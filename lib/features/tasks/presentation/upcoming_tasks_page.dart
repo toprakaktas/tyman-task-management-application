@@ -4,7 +4,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:tyman/core/providers/task_providers.dart';
-import 'package:tyman/core/widgets/task_card.dart';
+import 'package:tyman/features/tasks/presentation/widgets/smart_schedule_view.dart';
 
 class UpcomingTasksPage extends ConsumerWidget {
   const UpcomingTasksPage({super.key});
@@ -16,8 +16,10 @@ class UpcomingTasksPage extends ConsumerWidget {
 
     return Scaffold(
         appBar: AppBar(
+          backgroundColor: Colors.transparent,
+          centerTitle: true,
           title: Text(
-            'Upcoming Tasks',
+            'Daily Schedule',
             style: TextStyle(
                 fontSize: 25,
                 fontWeight: FontWeight.bold,
@@ -31,36 +33,42 @@ class UpcomingTasksPage extends ConsumerWidget {
           ),
         ),
         body: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12.0),
-            child: tasks.when(
-              data: (data) {
-                if (data.isEmpty) {
-                  return Animate(
-                      child: Center(
-                          child: Text('No tasks for today!',
-                                  style: TextStyle(
-                                      fontSize:
-                                          theme.textTheme.bodyLarge!.fontSize,
-                                      fontWeight:
-                                          theme.textTheme.bodyLarge!.fontWeight,
-                                      color: theme.textTheme.bodyLarge!.color))
-                              .animate(
-                                  onPlay: (controller) =>
-                                      controller.repeat(reverse: true))
-                              .shake(
-                                  rotation: 0.2,
-                                  duration: 1.seconds,
-                                  hz: 2,
-                                  curve: Curves.easeInOutCirc,
-                                  delay: 1.seconds)));
-                }
-                return ListView.builder(
-                  itemCount: data.length,
-                  itemBuilder: (_, index) => TaskCard(task: data[index]),
+          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+          child: tasks.when(
+            data: (data) {
+              if (data.isEmpty) {
+                return Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    spacing: 10,
+                    children: [
+                      Text(
+                        'No tasks for today!',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: theme.textTheme.bodyLarge!.color,
+                        ),
+                      ).animate(onPlay: (c) => c.repeat(reverse: true)).shake(
+                          duration: 1.seconds,
+                          hz: 2,
+                          curve: Curves.easeInOutCirc),
+                      Text("Enjoy your free time! ☕",
+                          style: TextStyle(color: theme.shadowColor)),
+                    ],
+                  ),
                 );
-              },
-              loading: () => const Center(child: CircularProgressIndicator()),
-              error: (error, _) => Center(child: Text('Error: $error')),
-            )));
+              }
+
+              return Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10.0, vertical: 10),
+                child: SmartScheduleView(tasks: data),
+              );
+            },
+            loading: () => const Center(child: CircularProgressIndicator()),
+            error: (error, _) => Center(child: Text('Error: $error')),
+          ),
+        ));
   }
 }
