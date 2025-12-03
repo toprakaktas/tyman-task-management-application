@@ -1,17 +1,14 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:tyman/core/constants/colors.dart';
-import 'package:tyman/core/widgets/task_card_style.dart';
 import 'package:tyman/data/models/task_data.dart';
-import 'package:tyman/data/models/task_model.dart';
 
 class TaskCard extends StatelessWidget {
   final TaskData task;
   final bool interactive;
   final VoidCallback? onEdit;
-  final VoidCallback? onDelete;
-  final VoidCallback? onMarkDone;
+  final Future<void> Function()? onDelete;
+  final Future<void> Function()? onMarkDone;
 
   const TaskCard(
       {super.key,
@@ -23,66 +20,97 @@ class TaskCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    //TODO: improve TaskModel usage.
-    final TaskModel model = TaskModel.fromTitle(task.category);
-    final style =
-        TaskCardStyle(task: task, model: model, interactive: interactive);
+    final theme = Theme.of(context);
 
     final screenWidth = MediaQuery.of(context).size.width;
     final marginH = screenWidth * 0.04;
-    final marginV = marginH / 4;
+    final marginV = marginH / 3;
 
-//TODO: interactive & completed bg colors needs fix
-    return Card(
-        elevation: 0.75,
-        margin:
-            EdgeInsets.symmetric(horizontal: marginH * 0.15, vertical: marginV),
-        color: style.backgroundColor,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        child: ListTile(
-          contentPadding:
-              EdgeInsets.symmetric(horizontal: marginH, vertical: marginV),
-          leading: interactive
-              ? IconButton(
-                  icon: Icon(
-                    style.toggleIcon,
-                    color: completeTaskColor,
-                  ),
-                  onPressed: onMarkDone)
-              : Icon(model.iconData, color: model.iconColor, size: 28),
-          title: Text(
-            task.description,
-            style: TextStyle(
-              fontWeight: FontWeight.w600,
-              color: style.titleColor,
-              fontSize: 16.5,
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10, right: 10),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(16),
+        child: Slidable(
+            key: ValueKey(task.id),
+            startActionPane: ActionPane(
+              extentRatio: 0.25,
+              motion: const ScrollMotion(),
+              dismissible: DismissiblePane(
+                closeOnCancel: true,
+                onDismissed: () {
+                  return;
+                },
+                confirmDismiss: () async {
+                  if (onMarkDone != null) onMarkDone!();
+
+                  return false;
+                },
+              ),
+              children: [
+                CustomSlidableAction(
+                  autoClose: true,
+                  backgroundColor: completeTaskColor,
+                  onPressed: ((context) {}),
+                  child: Icon(Icons.check_rounded, size: 25),
+                ),
+              ],
             ),
-          ),
-          subtitle: Text(
-            '${task.category} • ${DateFormat('dd/MM').format(task.dueDateTime)} • '
-            '${task.dueDateTime.hour.toString().padLeft(2, '0')}:'
-            '${task.dueDateTime.minute.toString().padLeft(2, '0')}',
-            style: TextStyle(
-              color: style.subtitleColor,
-              fontSize: 14,
-            ),
-          ),
-          trailing: interactive
-              ? Wrap(spacing: 0.5, children: [
-                  IconButton(
-                    icon: const Icon(CupertinoIcons.pen),
-                    onPressed: onEdit,
+            endActionPane: ActionPane(
+              extentRatio: 0.25,
+              motion: const ScrollMotion(),
+              dismissible: DismissiblePane(
+                closeOnCancel: true,
+                onDismissed: () {
+                  return;
+                },
+                confirmDismiss: () async {
+                  if (onDelete != null) await onDelete!();
+
+                  return false;
+                },
+              ),
+              children: [
+                CustomSlidableAction(
+                  autoClose: true,
+                  onPressed: ((context) {
+                    onDelete?.call();
+                  }),
+                  backgroundColor: deleteTaskColor,
+                  child: Icon(
+                    Icons.delete_rounded,
+                    size: 25,
                   ),
-                  IconButton(
-                    icon: const Icon(
-                      CupertinoIcons.trash,
-                      color: deleteTaskColor,
+                ),
+              ],
+            ),
+            child: Material(
+              color: theme.cardColor,
+              child: InkWell(
+                splashColor: theme.colorScheme.tertiary,
+                highlightColor: theme.colorScheme.primary,
+                onTap: () {
+                  if (onEdit != null) onEdit!();
+                },
+                child: Container(
+                  color: Colors.transparent,
+                  child: ListTile(
+                    contentPadding: EdgeInsets.symmetric(
+                        horizontal: marginH, vertical: marginV),
+                    title: Text(
+                      task.description,
+                      style: TextStyle(
+                        fontWeight: FontWeight.w600,
+                        color: theme.textTheme.bodyLarge!.color,
+                        fontSize: theme.textTheme.bodyMedium!.fontSize,
+                      ),
                     ),
-                    onPressed: onDelete,
+                    trailing:
+                        Icon(Icons.chevron_right, color: theme.iconTheme.color),
                   ),
-                ])
-              : Icon(style.statusIcon, // or CupertinoIcons
-                  color: style.statusIconColor),
-        ));
+                ),
+              ),
+            )),
+      ),
+    );
   }
 }
