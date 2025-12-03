@@ -2,12 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tyman/core/providers/task_providers.dart';
 import 'package:tyman/core/widgets/app_alert_dialog.dart';
-import 'package:tyman/core/widgets/task_card.dart';
 import 'package:tyman/data/models/task_data.dart';
+import 'package:tyman/data/models/task_model.dart';
 import 'package:tyman/features/tasks/presentation/widgets/date_picker.dart';
 import 'package:tyman/features/tasks/presentation/widgets/delete_task_dialog.dart';
 import 'package:tyman/features/tasks/presentation/widgets/detail_sliver_app_bar.dart';
 import 'package:tyman/features/tasks/presentation/widgets/edit_task_dialog.dart';
+import 'package:tyman/features/tasks/presentation/widgets/task_timeline_item.dart';
 import 'package:tyman/features/tasks/presentation/widgets/task_title.dart';
 
 class TaskCategoryPage extends ConsumerStatefulWidget {
@@ -23,8 +24,6 @@ class TaskCategoryPage extends ConsumerStatefulWidget {
 }
 
 class _TaskCategoryPageState extends ConsumerState<TaskCategoryPage> {
-  bool hasChanges = false;
-
   Future<void> _editTask(TaskData task) async {
     final editedTask = await showDialog<TaskData>(
       context: context,
@@ -80,30 +79,28 @@ class _TaskCategoryPageState extends ConsumerState<TaskCategoryPage> {
         ref.watch(taskCategoryControllerProvider(widget.categoryFilter));
     final controller = ref
         .read(taskCategoryControllerProvider(widget.categoryFilter).notifier);
-
     final asyncTasks =
         ref.watch(taskCategoryStreamProvider(widget.categoryFilter));
 
-    return PopScope(
-      canPop: false,
-      onPopInvokedWithResult: (didPop, result) {
-        if (didPop) return;
-        Navigator.of(context).pop<bool>(hasChanges);
-      },
-      child: Scaffold(
-        backgroundColor: Colors.black,
-        body: asyncTasks.when(
-          loading: () => const Center(child: CircularProgressIndicator()),
-          error: (err, st) => Center(child: Text('Error: $err')),
-          data: (tasks) {
-            final taskLeft = tasks.where((task) => !task.completed).length;
-            final slivers = <Widget>[
-              DetailSliverAppBar(
-                  category: widget.categoryFilter, taskLeft: taskLeft),
-              SliverToBoxAdapter(
+    final theme = Theme.of(context);
+    final taskModel = TaskModel.fromTitle(widget.categoryFilter);
+
+    return Scaffold(
+      backgroundColor: theme.colorScheme.surface,
+      body: asyncTasks.when(
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (err, st) => Center(child: Text('Error: $err')),
+        data: (tasks) {
+          final taskLeft = tasks.where((task) => !task.completed).length;
+          final slivers = <Widget>[
+            DetailSliverAppBar(
+                category: widget.categoryFilter, taskLeft: taskLeft),
+            SliverToBoxAdapter(
+              child: ColoredBox(
+                color: taskModel.btnColor,
                 child: Container(
-                  decoration: const BoxDecoration(
-                    color: Colors.white,
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.surface,
                     borderRadius: BorderRadius.only(
                         topLeft: Radius.circular(30),
                         topRight: Radius.circular(30)),
@@ -111,11 +108,13 @@ class _TaskCategoryPageState extends ConsumerState<TaskCategoryPage> {
                   child: Column(
                     children: [
                       DatePicker(
-                          selectedDate: controllerState.selectedDate,
-                          calendarFormat: controller.calendarFormat,
-                          onFormatChanged: (format) =>
-                              controller.updateFormat(format),
-                          onDateChanged: (date) => controller.updateDate(date)),
+                        selectedDate: controllerState.selectedDate,
+                        calendarFormat: controller.calendarFormat,
+                        onFormatChanged: (format) =>
+                            controller.updateFormat(format),
+                        onDateChanged: (date) => controller.updateDate(date),
+                        category: widget.categoryFilter,
+                      ),
                       TaskTitle(
                           onFilterSelected: (filter) =>
                               controller.updateFilter(filter),
@@ -124,45 +123,52 @@ class _TaskCategoryPageState extends ConsumerState<TaskCategoryPage> {
                   ),
                 ),
               ),
-            ];
+            ),
+          ];
 
-            if (tasks.isEmpty) {
-              slivers.add(
-                SliverFillRemaining(
-                  child: Container(
-                    color: Colors.white,
-                    child: const Center(
-                      child: Text('There are no tasks for today.',
-                          style: TextStyle(color: Colors.grey, fontSize: 18)),
-                    ),
+          if (tasks.isEmpty) {
+            slivers.add(
+              SliverFillRemaining(
+                child: Container(
+                  color: theme.colorScheme.surface,
+                  child: Center(
+                    child: Text('There are no tasks for today.',
+                        style: TextStyle(
+                            color: theme.colorScheme.onSurface, fontSize: 18)),
                   ),
                 ),
-              );
-            } else {
-              slivers.add(
-                SliverList(
-                  delegate: SliverChildBuilderDelegate(
-                    (_, index) {
-                      TaskData task = tasks[index];
-                      return TaskCard(
-                        task: task,
-                        interactive: true,
-                        onEdit: () => _editTask(task),
-                        onDelete: () => _deleteTask(task),
-                        onMarkDone: () => _markTaskAsDone(task),
-                      );
-                    },
-                    childCount: tasks.length,
-                  ),
-                ),
-              );
-            }
-
-            return CustomScrollView(
-              slivers: slivers,
+              ),
             );
-          },
-        ),
+          } else {
+            slivers.add(
+              SliverList(
+                delegate: SliverChildBuilderDelegate(
+                  (_, index) {
+                    final task = tasks[index];
+
+                    final isFirst = index == 0;
+                    final isLast = index == tasks.length - 1;
+
+                    return TaskTimelineItem(
+                      task: task,
+                      isFirst: isFirst,
+                      isLast: isLast,
+                      categoryColor: taskModel.iconColor,
+                      onEdit: () => _editTask(task),
+                      onDelete: () => _deleteTask(task),
+                      onMarkDone: () => _markTaskAsDone(task),
+                    );
+                  },
+                  childCount: tasks.length,
+                ),
+              ),
+            );
+          }
+
+          return CustomScrollView(
+            slivers: slivers,
+          );
+        },
       ),
     );
   }
