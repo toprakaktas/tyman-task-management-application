@@ -23,94 +23,95 @@ class TaskCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final taskModel = TaskModel.fromTitle(task.category);
     final screenWidth = MediaQuery.of(context).size.width;
-    final marginH = screenWidth * 0.04;
-    final marginV = marginH / 3;
+    final marginH = screenWidth * 0.035;
 
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 10, right: 10),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(16),
-        child: Slidable(
-            key: ValueKey(task.id),
-            startActionPane: ActionPane(
-              extentRatio: 0.25,
-              motion: const ScrollMotion(),
-              dismissible: DismissiblePane(
-                closeOnCancel: true,
-                onDismissed: () {
-                  return;
-                },
-                confirmDismiss: () async {
-                  if (onMarkDone != null) onMarkDone!();
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(16),
+      child: Slidable(
+          key: ValueKey(task.id),
+          startActionPane: ActionPane(
+            extentRatio: 0.25,
+            motion: const ScrollMotion(),
+            dismissible: DismissiblePane(
+              closeOnCancel: true,
+              onDismissed: () {
+                return;
+              },
+              confirmDismiss: () async {
+                if (onMarkDone != null) onMarkDone!();
 
-                  return false;
-                },
-              ),
-              children: [
-                CustomSlidableAction(
-                  autoClose: true,
-                  backgroundColor: completeTaskColor,
-                  onPressed: ((context) {}),
-                  child: Icon(Icons.check_rounded, size: 25),
-                ),
-              ],
+                return false;
+              },
             ),
-            endActionPane: ActionPane(
-              extentRatio: 0.25,
-              motion: const ScrollMotion(),
-              dismissible: DismissiblePane(
-                closeOnCancel: true,
-                onDismissed: () {
-                  return;
-                },
-                confirmDismiss: () async {
-                  if (onDelete != null) await onDelete!();
-
-                  return false;
-                },
+            children: [
+              CustomSlidableAction(
+                autoClose: true,
+                backgroundColor: completeTaskColor,
+                onPressed: ((context) {}),
+                child: Icon(Icons.check_rounded, size: 25),
               ),
-              children: [
-                CustomSlidableAction(
-                  autoClose: true,
-                  onPressed: ((context) {
-                    onDelete?.call();
-                  }),
-                  backgroundColor: deleteTaskColor,
-                  child: Icon(
-                    Icons.delete_rounded,
-                    size: 25,
-                  ),
-                ),
-              ],
+            ],
+          ),
+          endActionPane: ActionPane(
+            extentRatio: 0.25,
+            motion: const ScrollMotion(),
+            dismissible: DismissiblePane(
+              closeOnCancel: true,
+              onDismissed: () {
+                return;
+              },
+              confirmDismiss: () async {
+                if (onDelete != null) await onDelete!();
+
+                return false;
+              },
             ),
-            child: Material(
-              color: taskModel.btnColor,
-              child: InkWell(
-                splashColor: taskModel.iconColor,
-                highlightColor: taskModel.iconColor,
-                onTap: () {
-                  if (onEdit != null) onEdit!();
-                },
-                child: Container(
-                  color: Colors.transparent,
-                  child: ListTile(
-                    contentPadding: EdgeInsets.symmetric(
-                        horizontal: marginH, vertical: marginV),
-                    title: Text(
-                      task.description,
-                      style: TextStyle(
-                        fontWeight: FontWeight.w600,
-                        color: Colors.black87,
-                        fontSize: 16,
-                      ),
+            children: [
+              CustomSlidableAction(
+                autoClose: true,
+                onPressed: ((context) {
+                  onDelete?.call();
+                }),
+                backgroundColor: deleteTaskColor,
+                child: Icon(
+                  Icons.delete_rounded,
+                  size: 25,
+                ),
+              ),
+            ],
+          ),
+          child: Material(
+            color: taskModel.btnColor,
+            child: InkWell(
+              splashColor: taskModel.iconColor,
+              highlightColor: taskModel.iconColor,
+              onTap: () {
+                if (onEdit != null) onEdit!();
+              },
+              child: Container(
+                color: Colors.transparent,
+                child: ListTile(
+                  horizontalTitleGap:
+                      ListTileTheme.of(context).horizontalTitleGap,
+                  minVerticalPadding: 0,
+                  minTileHeight: marginH,
+                  contentPadding: EdgeInsets.symmetric(
+                      horizontal: marginH, vertical: marginH),
+                  title: Text(
+                    task.description,
+                    style: TextStyle(
+                      fontWeight: FontWeight.w500,
+                      color: Colors.black87,
+                      fontSize: 16,
                     ),
-                    trailing:
-                        Icon(Icons.chevron_right, color: taskModel.iconColor),
                   ),
+                  titleAlignment: ListTileTitleAlignment.center,
+                  trailing:
+                      Icon(Icons.chevron_right, color: taskModel.iconColor),
                 ),
               ),
-            )),
-      ),
+            ),
+          )),
     );
   }
 }
