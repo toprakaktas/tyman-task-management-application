@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:tyman/core/constants/colors.dart';
 import 'package:tyman/data/models/task_data.dart';
+import 'package:tyman/data/models/task_model.dart';
 
 class TaskCard extends StatelessWidget {
   final TaskData task;
@@ -20,8 +21,7 @@ class TaskCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
+    final taskModel = TaskModel.fromTitle(task.category);
     final screenWidth = MediaQuery.of(context).size.width;
     final marginH = screenWidth * 0.04;
     final marginV = marginH / 3;
@@ -84,10 +84,10 @@ class TaskCard extends StatelessWidget {
               ],
             ),
             child: Material(
-              color: theme.cardColor,
+              color: taskModel.btnColor,
               child: InkWell(
-                splashColor: theme.colorScheme.tertiary,
-                highlightColor: theme.colorScheme.primary,
+                splashColor: taskModel.iconColor,
+                highlightColor: taskModel.iconColor,
                 onTap: () {
                   if (onEdit != null) onEdit!();
                 },
@@ -100,12 +100,12 @@ class TaskCard extends StatelessWidget {
                       task.description,
                       style: TextStyle(
                         fontWeight: FontWeight.w600,
-                        color: theme.textTheme.bodyLarge!.color,
-                        fontSize: theme.textTheme.bodyMedium!.fontSize,
+                        color: Colors.black87,
+                        fontSize: 16,
                       ),
                     ),
                     trailing:
-                        Icon(Icons.chevron_right, color: theme.iconTheme.color),
+                        Icon(Icons.chevron_right, color: taskModel.iconColor),
                   ),
                 ),
               ),
