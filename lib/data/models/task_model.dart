@@ -41,16 +41,16 @@ class TaskModel {
             title: 'Health',
             iconData: Icons.favorite_rounded,
             bgColor: cardRedLight,
-            iconColor: kRedDark,
+            iconColor: cardRedDark,
             btnColor: cardRed);
 
   TaskModel.other()
       : this(
             title: 'Other',
             iconData: Icons.app_registration_rounded,
-            bgColor: Colors.grey,
-            iconColor: designGrey,
-            btnColor: designGreyLight);
+            bgColor: cardGreenLight,
+            iconColor: cardGreenDark,
+            btnColor: cardGreen);
 
   static TaskModel fromTitle(String title) {
     switch (title) {
