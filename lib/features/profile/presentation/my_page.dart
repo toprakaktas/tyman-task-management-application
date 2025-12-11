@@ -9,7 +9,6 @@ import 'package:tyman/core/utils/image_utils.dart';
 import 'package:tyman/core/utils/snackbar_helper.dart';
 import 'package:tyman/core/widgets/app_bottom_nav_bar.dart';
 import 'package:tyman/core/widgets/cached_user_avatar.dart';
-import 'package:tyman/core/widgets/custom_text_field.dart';
 import 'dart:io';
 import 'package:tyman/core/constants/colors.dart';
 import 'package:go_router/go_router.dart';
@@ -152,39 +151,40 @@ class MyPageState extends ConsumerState<MyPage> {
           _loadedUserId = appUser.uid;
         }
 
-        return Container(
-          decoration: BoxDecoration(
-            gradient: BackgroundDecoration.decoration,
-          ),
-          child: Scaffold(
+        return Scaffold(
+          extendBodyBehindAppBar: true,
+          extendBody: true,
+          appBar: AppBar(
             backgroundColor: Colors.transparent,
-            appBar: AppBar(
-              backgroundColor: Colors.transparent,
-              elevation: 0,
-              title: const Text('My Profile',
-                  style: TextStyle(color: Colors.white, fontSize: 22)),
-              centerTitle: true,
-            ),
-            body: _buildProfileContent(appUser),
-            bottomNavigationBar: AppBottomNavBar(
-                currentIndex: 1,
-                onTap: (index) {
-                  if (index == 0) {
-                    context.go('/home');
-                  }
-                }),
+            elevation: 0,
+            title: const Text('My Profile',
+                style: TextStyle(color: Colors.white, fontSize: 22)),
+            centerTitle: true,
           ),
+          body: Container(
+              decoration: BoxDecoration(
+                  gradient: BackgroundDecoration.getGradient(context)),
+              child: _buildProfileContent(appUser, context)),
+          bottomNavigationBar: AppBottomNavBar(
+              currentIndex: 1,
+              onTap: (index) {
+                if (index == 0) {
+                  context.go('/home');
+                }
+              }),
         );
       },
     );
   }
 
-  Widget _buildProfileContent(AppUser appUser) {
+  Widget _buildProfileContent(AppUser appUser, BuildContext context) {
+    final theme = Theme.of(context);
     return Center(
       child: SingleChildScrollView(
         padding: const EdgeInsets.all(20.5),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
+          spacing: 25,
           children: <Widget>[
             GestureDetector(
               onTap: () => _pickImage(appUser),
@@ -207,25 +207,89 @@ class MyPageState extends ConsumerState<MyPage> {
                 ],
               ),
             ),
-            const SizedBox(height: 20),
-            CustomTextField(
-                controller: nameController, label: 'Name', enabled: true),
-            const SizedBox(height: 20),
-            CustomTextField(
-                controller: emailController, label: 'Email', enabled: false),
-            const SizedBox(height: 20),
+            TextField(
+              onTapOutside: (_) => FocusScope.of(context).unfocus(),
+              controller: nameController,
+              cursorOpacityAnimates: true,
+              enabled: true,
+              decoration: InputDecoration(
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                labelText: 'Name',
+                enabledBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: theme.colorScheme.primary),
+                  borderRadius: BorderRadius.all(Radius.circular(16)),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: theme.colorScheme.tertiary),
+                  borderRadius: BorderRadius.all(Radius.circular(16)),
+                ),
+                contentPadding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              ),
+              style: TextStyle(
+                  color: theme.textTheme.bodyMedium!.color,
+                  fontWeight: theme.textTheme.bodyMedium!.fontWeight,
+                  fontSize: theme.textTheme.bodyMedium!.fontSize),
+            ),
+            TextField(
+              onTapOutside: (_) => FocusScope.of(context).unfocus(),
+              controller: emailController,
+              readOnly: true,
+              enableInteractiveSelection: false,
+              style: TextStyle(
+                  color: theme.textTheme.bodyMedium!.color,
+                  fontWeight: theme.textTheme.bodyMedium!.fontWeight,
+                  fontSize: theme.textTheme.bodyMedium!.fontSize),
+              decoration: InputDecoration(
+                border: OutlineInputBorder(
+                  borderSide: BorderSide(
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                labelText: 'E-mail',
+                enabledBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: theme.colorScheme.primary),
+                  borderRadius: BorderRadius.all(Radius.circular(16)),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: theme.colorScheme.tertiary),
+                  borderRadius: BorderRadius.all(Radius.circular(16)),
+                ),
+                contentPadding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              ),
+            ),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                CupertinoButton(
+                ElevatedButton(
                   onPressed: () => _updateProfile(appUser),
-                  color: CupertinoColors.systemGrey3,
-                  child: const Text('Update Profile'),
+                  style: ElevatedButton.styleFrom(
+                    foregroundColor: theme.buttonTheme.colorScheme?.onPrimary,
+                    backgroundColor: theme.buttonTheme.colorScheme?.primary,
+                  ),
+                  child: Text('Update Profile',
+                      style: TextStyle(
+                          color: theme.textTheme.bodyMedium!.color,
+                          fontWeight: theme.textTheme.labelLarge!.fontWeight,
+                          fontSize: theme.textTheme.labelLarge!.fontSize)),
                 ),
-                CupertinoButton(
+                ElevatedButton(
                   onPressed: () => _signOut(context),
-                  color: CupertinoColors.darkBackgroundGray,
-                  child: const Text('Sign Out'),
+                  style: ElevatedButton.styleFrom(
+                    foregroundColor:
+                        Theme.of(context).buttonTheme.colorScheme?.onSecondary,
+                    backgroundColor:
+                        Theme.of(context).buttonTheme.colorScheme?.secondary,
+                  ),
+                  child: Text('Sign Out',
+                      style: TextStyle(
+                          color: theme.textTheme.bodyMedium!.color,
+                          fontWeight: theme.textTheme.labelLarge!.fontWeight,
+                          fontSize: theme.textTheme.labelLarge!.fontSize)),
                 ),
               ],
             ),
