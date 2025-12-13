@@ -33,19 +33,83 @@ class MyPageState extends ConsumerState<MyPage> {
     super.dispose();
   }
 
+  Future<bool> _imageConfirmation(File file) async {
+    final theme = Theme.of(context);
+
+    return await showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (ctx) => AlertDialog(
+                backgroundColor: theme.cardColor,
+                title: Text(
+                  'Do you want to upload this image?',
+                  style: TextStyle(
+                    color: theme.textTheme.bodyMedium!.color,
+                  ),
+                ),
+                content: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(12),
+                      child: Image.file(
+                        file,
+                        height: 200,
+                        width: 200,
+                        fit: BoxFit.cover,
+                      ),
+                    )
+                  ],
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(ctx, false),
+                    child: Text(
+                      'Cancel',
+                      style: TextStyle(
+                        color: deleteTaskColor,
+                      ),
+                    ),
+                  ),
+                  TextButton(
+                    onPressed: () => Navigator.pop(ctx, true),
+                    child: Text(
+                      'Upload',
+                      style: TextStyle(color: taskColor),
+                    ),
+                  )
+                ]));
+  }
+
   Future<void> _pickImage(AppUser appUser) async {
+    final theme = Theme.of(context);
     final source = await showDialog<ImageSource>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Select image source'),
+        title: Text(
+          'Select image source',
+          style: TextStyle(
+            color: theme.textTheme.bodyMedium!.color,
+          ),
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, ImageSource.camera),
-            child: const Text('Camera'),
+            child: Text(
+              'Camera',
+              style: TextStyle(
+                color: theme.textTheme.bodyMedium!.color,
+              ),
+            ),
           ),
           TextButton(
             onPressed: () => Navigator.pop(ctx, ImageSource.gallery),
-            child: const Text('Gallery'),
+            child: Text(
+              'Gallery',
+              style: TextStyle(
+                color: theme.textTheme.bodyMedium!.color,
+              ),
+            ),
           ),
         ],
       ),
@@ -56,6 +120,8 @@ class MyPageState extends ConsumerState<MyPage> {
     if (picked == null) return;
 
     final file = File(picked.path);
+    final isConfirmed = await _imageConfirmation(file);
+    if (!isConfirmed) return;
 
     try {
       final compressedFile = await compressImage(file);
@@ -75,7 +141,6 @@ class MyPageState extends ConsumerState<MyPage> {
         downloadUrl,
       );
       appUser.photo = downloadUrl;
-      await _refreshUserProfile();
       if (mounted) {
         showSnackBar(context, 'Profile picture updated successfully');
       }
@@ -96,7 +161,6 @@ class MyPageState extends ConsumerState<MyPage> {
         emailController.text,
         appUser.photo,
       );
-      await _refreshUserProfile();
       if (mounted) {
         showSnackBar(context, 'Profile updated successfully');
       }
@@ -118,13 +182,6 @@ class MyPageState extends ConsumerState<MyPage> {
         showSnackBar(context, 'Error signing out. Try again.');
       }
     }
-  }
-
-  Future<void> _refreshUserProfile() async {
-    ref.invalidate(userProfileProvider);
-    try {
-      await ref.read(userProfileProvider.future);
-    } catch (_) {}
   }
 
   @override
