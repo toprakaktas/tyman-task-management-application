@@ -44,22 +44,25 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyBVm3KdD57OXfUaGsqwd5TNFb7NyJFq1LU',
-    appId: '1:807679916990:web:7d07f3fdff4f27b77457ef',
-    messagingSenderId: '807679916990',
-    projectId: 'android-task-monitoring-a7d9a',
-    authDomain: 'android-task-monitoring-a7d9a.firebaseapp.com',
-    databaseURL: 'https://android-task-monitoring-a7d9a-default-rtdb.europe-west1.firebasedatabase.app',
-    storageBucket: 'android-task-monitoring-a7d9a.appspot.com',
-    measurementId: 'G-P5RG389SQ9',
-  );
+      apiKey: 'AIzaSyBVm3KdD57OXfUaGsqwd5TNFb7NyJFq1LU',
+      appId: '1:807679916990:web:7d07f3fdff4f27b77457ef',
+      messagingSenderId: '807679916990',
+      projectId: 'android-task-monitoring-a7d9a',
+      authDomain: 'android-task-monitoring-a7d9a.firebaseapp.com',
+      databaseURL:
+          'https://android-task-monitoring-a7d9a-default-rtdb.europe-west1.firebasedatabase.app',
+      storageBucket: 'android-task-monitoring-a7d9a.appspot.com',
+      measurementId: 'G-P5RG389SQ9',
+      androidClientId:
+          '807679916990-ni1koca7kl3b8jg5d3dh57gguoe8m1gi.apps.googleusercontent.com');
 
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyB-lRpqo7h5fXFntfBMQNwG8ap4n-SHjV8',
     appId: '1:807679916990:android:4bbe198f274176cf7457ef',
     messagingSenderId: '807679916990',
     projectId: 'android-task-monitoring-a7d9a',
-    databaseURL: 'https://android-task-monitoring-a7d9a-default-rtdb.europe-west1.firebasedatabase.app',
+    databaseURL:
+        'https://android-task-monitoring-a7d9a-default-rtdb.europe-west1.firebasedatabase.app',
     storageBucket: 'android-task-monitoring-a7d9a.appspot.com',
   );
 
@@ -68,9 +71,11 @@ class DefaultFirebaseOptions {
     appId: '1:807679916990:ios:3800a92daf14a1ee7457ef',
     messagingSenderId: '807679916990',
     projectId: 'android-task-monitoring-a7d9a',
-    databaseURL: 'https://android-task-monitoring-a7d9a-default-rtdb.europe-west1.firebasedatabase.app',
+    databaseURL:
+        'https://android-task-monitoring-a7d9a-default-rtdb.europe-west1.firebasedatabase.app',
     storageBucket: 'android-task-monitoring-a7d9a.appspot.com',
-    iosClientId: '807679916990-qsn1hf46gof05h28kuh6uoep1841653v.apps.googleusercontent.com',
+    iosClientId:
+        '807679916990-qsn1hf46gof05h28kuh6uoep1841653v.apps.googleusercontent.com',
     iosBundleId: 'com.example.tyman',
   );
 
@@ -79,9 +84,11 @@ class DefaultFirebaseOptions {
     appId: '1:807679916990:ios:3800a92daf14a1ee7457ef',
     messagingSenderId: '807679916990',
     projectId: 'android-task-monitoring-a7d9a',
-    databaseURL: 'https://android-task-monitoring-a7d9a-default-rtdb.europe-west1.firebasedatabase.app',
+    databaseURL:
+        'https://android-task-monitoring-a7d9a-default-rtdb.europe-west1.firebasedatabase.app',
     storageBucket: 'android-task-monitoring-a7d9a.appspot.com',
-    iosClientId: '807679916990-qsn1hf46gof05h28kuh6uoep1841653v.apps.googleusercontent.com',
+    iosClientId:
+        '807679916990-qsn1hf46gof05h28kuh6uoep1841653v.apps.googleusercontent.com',
     iosBundleId: 'com.example.tyman',
   );
 }
