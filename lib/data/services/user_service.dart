@@ -58,6 +58,16 @@ class UserService implements UserRepository {
   }
 
   @override
+  Stream<AppUser?> getUserStream(String uid) {
+    return firestore.collection('users').doc(uid).snapshots().map((snapshot) {
+      if (snapshot.exists && snapshot.data() != null) {
+        return AppUser.fromFirestore(snapshot.data()!, uid);
+      }
+      return null;
+    });
+  }
+
+  @override
   Future<void> updateProfile(
       AppUser appUser, String name, String email, String photo) async {
     try {

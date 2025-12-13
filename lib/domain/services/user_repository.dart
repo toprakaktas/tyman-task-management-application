@@ -7,4 +7,5 @@ abstract class UserRepository {
   Future<void> updateProfile(
       AppUser appUser, String name, String email, String photo);
   Future<String> uploadProfileImage(File file);
+  Stream<AppUser?> getUserStream(String uid);
 }
