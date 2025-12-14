@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tyman/data/services/auth_service.dart';
 import 'package:tyman/domain/usecases/auth/sign_in.dart';
+import 'package:tyman/domain/usecases/auth/sign_in_with_google.dart';
 import 'package:tyman/domain/usecases/auth/sign_out.dart';
 import 'package:tyman/domain/usecases/auth/sign_up.dart';
 
@@ -21,3 +22,6 @@ final signUpProvider =
 
 final signOutProvider =
     Provider<SignOut>((ref) => SignOut(ref.read(authServiceProvider)));
+
+final signInWithGoogleProvider = Provider<SignInWithGoogle>(
+    (ref) => SignInWithGoogle(ref.read(authServiceProvider)));

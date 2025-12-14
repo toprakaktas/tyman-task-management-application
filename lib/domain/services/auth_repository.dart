@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 abstract class AuthRepository {
@@ -7,4 +8,6 @@ abstract class AuthRepository {
   Future<void> signIn(String email, String password, BuildContext context);
 
   Future<void> signOut(BuildContext context);
+
+  Future<User?> signInWithGoogle(BuildContext context);
 }
