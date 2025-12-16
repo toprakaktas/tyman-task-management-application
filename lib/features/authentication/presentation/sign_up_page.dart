@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:tyman/core/constants/colors.dart';
 import 'package:tyman/core/providers/auth_providers.dart';
 import 'package:tyman/core/providers/theme_provider.dart';
+import 'package:tyman/core/utils/snackbar_helper.dart';
 
 final signUpPasswordObscuredProvider =
     StateProvider.autoDispose<bool>((ref) => true);
@@ -187,27 +188,78 @@ class SignUpPageState extends ConsumerState<SignUpPage> {
   Widget signUpBottom(BuildContext context) {
     final theme = Theme.of(context);
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 100),
-      child: GestureDetector(
-        onTap: () {
-          ref.read(signUpProvider)(
-              email.text, password.text, passwordConfirm.text, context);
-        },
-        child: Container(
-          alignment: Alignment.center,
-          width: double.infinity,
-          height: 50,
-          decoration: BoxDecoration(
-              color: theme.colorScheme.primary,
-              borderRadius: BorderRadius.circular(10)),
-          child: Text(
-            'Sign Up',
-            style: TextStyle(
-                color: theme.colorScheme.secondary,
-                fontSize: 18.5,
-                fontWeight: FontWeight.w500),
+      padding: const EdgeInsets.symmetric(horizontal: 90),
+      child: Column(
+        spacing: 5,
+        children: [
+          ElevatedButton(
+            onPressed: () {
+              ref.read(signUpProvider)(
+                  email.text, password.text, passwordConfirm.text, context);
+            },
+            style: ElevatedButton.styleFrom(
+              elevation: 2,
+              minimumSize: Size(double.infinity, 54),
+              backgroundColor: theme.colorScheme.secondary,
+              foregroundColor: theme.colorScheme.primary,
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
+              spacing: 10,
+              children: [
+                Icon(
+                  Icons.email,
+                  size: 24,
+                ),
+                Text(
+                  'Sign Up',
+                  style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      letterSpacing: 0.5),
+                ),
+              ],
+            ),
           ),
-        ),
+          Divider(
+            color: theme.colorScheme.primary,
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              final user =
+                  await ref.read(signInWithGoogleProvider).call(context);
+              if (user != null && context.mounted) {
+                context.go('/home');
+              } else if (context.mounted) {
+                showSnackBar(context, 'Failed to sign up with Google.');
+                return;
+              }
+            },
+            style: ElevatedButton.styleFrom(
+              elevation: 2,
+              minimumSize: Size(double.infinity, 54),
+              backgroundColor: theme.colorScheme.secondary,
+              foregroundColor: theme.colorScheme.primary,
+            ),
+            child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
+                spacing: 10,
+                children: [
+                  Image.asset(
+                    'assets/images/google.png',
+                    width: 24,
+                    height: 24,
+                  ),
+                  Text('Google',
+                      style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          letterSpacing: 0.5))
+                ]),
+          )
+        ],
       ),
     );
   }
@@ -239,7 +291,7 @@ class SignUpPageState extends ConsumerState<SignUpPage> {
               prefixIcon: Icon(icon,
                   color: isFocused
                       ? theme.colorScheme.primary
-                      : theme.unselectedWidgetColor),
+                      : theme.colorScheme.primary.withAlpha(100)),
               contentPadding:
                   const EdgeInsets.symmetric(horizontal: 15, vertical: 15),
               hintText: typeName,
