@@ -53,6 +53,7 @@ class AuthService implements AuthRepository {
   Future<void> signOut(BuildContext context) async {
     try {
       await _auth.signOut();
+      await _googleSignIn.signOut();
       showSnackBar(context, 'Successfully logged out!');
     } catch (e) {
       showSnackBar(context, 'Failed to logout.');
@@ -62,7 +63,9 @@ class AuthService implements AuthRepository {
   @override
   Future<User?> signInWithGoogle(BuildContext context) async {
     try {
-      _googleSignIn.initialize();
+      await _googleSignIn.initialize(
+          serverClientId:
+              '807679916990-ni1koca7kl3b8jg5d3dh57gguoe8m1gi.apps.googleusercontent.com');
       final GoogleSignInAccount? googleUser =
           await _googleSignIn.authenticate();
 
@@ -83,6 +86,9 @@ class AuthService implements AuthRepository {
       }
       return user;
     } catch (e) {
+      if (context.mounted) {
+        showSnackBar(context, 'Google Sign-In failed. Try again!');
+      }
       throw Exception(e.toString());
     }
   }
