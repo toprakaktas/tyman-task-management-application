@@ -1,5 +1,4 @@
 import 'dart:math';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 const Color cardYellowLight = Color(0xFFFFF7EC);
@@ -8,11 +7,15 @@ const Color cardYellowDark = Color(0xFFEBBB7F);
 
 const Color cardRedLight = Color(0xFFFCF0F0);
 const Color cardRed = Color(0xFFFBE4E6);
-const Color kRedDark = Color(0xFFF08A8E);
+const Color cardRedDark = Color(0xFFF08A8E);
 
 const Color cardBlueLight = Color(0xFFEDF4FE);
 const Color cardBlue = Color(0xFFE1EDFC);
 const Color cardBlueDark = Color(0xFFC0D3F8);
+
+const Color cardGreenLight = Color(0xFFDCFCE7);
+const Color cardGreen = Color(0xFFC7F6D0);
+const Color cardGreenDark = Color(0xFF87D1A0);
 
 const Color designBlack = Color(0x85000000);
 const Color designGreyDark = Color(0xFF343535);
@@ -26,17 +29,12 @@ const Color lightDesignThird = Color(0xFFAFAFAF);
 const Color lightDesignFourth = Color(0xFFD6D6D6);
 const Color lightDesignFifth = Color(0xCAEFEFEF);
 
-const Color taskColor = Color(0xFF3D7BB4);
+const Color taskColor = Color(0xFF4695DD);
 const Color completeTaskColor = Color(0xCE29813A);
-const Color markedTaskColor = Color(0xDF9EE1AD);
+const Color markedTaskColor = Color(0xFF66BB6A);
 const Color deleteTaskColor = Color(0xFFF74F43);
 
-const detailTaskBGColor = CupertinoColors.systemGrey5;
-
-const upcomingIconColorActive = CupertinoColors.activeGreen;
-const upcomingIconColorInactive = Color(0xFFFF5252);
-
-const selectedItemColor = Color(0xFF3F75D4);
+const selectedItemColor = Color(0xFF4779BA);
 const unselectedItemColor = Color(0xFF999999);
 const boxShadowColor = Color(0x339E9E9E);
 
@@ -54,6 +52,8 @@ const signCardShadowDark = Color(0xFF484848);
 
 const signCardLight = Color(0xFFBCBCBC);
 const signCardShadowLight = Color(0xFF6E6E6E);
+
+const iconColor = Color(0xFF272525);
 
 List<Color> gradientBackground = [
   designBlack,
@@ -89,5 +89,3 @@ class BackgroundDecoration {
     return isDark ? decoration : lightDecoration;
   }
 }
-
-//TODO: Add task title colors
