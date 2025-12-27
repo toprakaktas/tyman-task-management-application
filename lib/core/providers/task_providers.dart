@@ -1,12 +1,14 @@
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:tyman/core/providers/auth_providers.dart';
+import 'package:tyman/core/providers/user_provider.dart';
 import 'package:tyman/data/models/task_data.dart';
 import 'package:tyman/data/models/task_model.dart';
 import 'package:tyman/data/services/notification_service.dart';
 import 'package:tyman/data/services/task_service.dart';
 import 'package:tyman/domain/services/notification_repository.dart';
-import 'package:tyman/domain/usecases/notification/schedule_upcoming_tasks_notification.dart';
 import 'package:tyman/domain/usecases/task/add_task.dart';
 import 'package:tyman/domain/usecases/task/delete_task.dart';
 import 'package:tyman/domain/usecases/task/fetch_task_counts.dart';
@@ -88,38 +90,32 @@ final notificationRepositoryProvider = Provider<NotificationRepository>((ref) {
   return NotificationService();
 });
 
-final scheduleUpcomingTasksNotificationProvider =
-    Provider<ScheduleUpcomingTasksNotification>((ref) {
-  return ScheduleUpcomingTasksNotification(
-    ref.watch(notificationRepositoryProvider),
-  );
-});
+final fcmSetupProvider = FutureProvider<void>((ref) async {
+  final notificationRepo = ref.read(notificationRepositoryProvider);
+  final userRepo = ref.read(userServiceProvider);
 
-final upcomingTasksNotificationProvider = Provider<void>((ref) {
-  final scheduleNotification =
-      ref.watch(scheduleUpcomingTasksNotificationProvider);
+  ref.watch(authStateProvider);
+  final user = FirebaseAuth.instance.currentUser;
 
-  ref.listen(tasksForTodayProvider, (previous, next) {
-    next.whenData((tasks) {
-      final incompleteTasks = tasks.where((task) => !task.completed).toList();
-      final taskCount = incompleteTasks.length;
+  await notificationRepo.requestPermission();
 
-      scheduleNotification.call(taskCount: taskCount);
-    });
+  final token = await notificationRepo.getToken();
+  if (token != null && user != null) {
+    await userRepo.saveFCMToken(token);
+  }
+
+  notificationRepo.onTokenRefresh.listen((newToken) {
+    if (newToken != null && user != null) {
+      userRepo.saveFCMToken(newToken);
+    }
   });
-});
 
-final taskNotificationListenerProvider = Provider.autoDispose<void>((ref) {
-  final tasksAsync = ref.watch(tasksForTodayProvider);
-  final scheduleNotification =
-      ref.watch(scheduleUpcomingTasksNotificationProvider);
-
-  tasksAsync.whenData((tasks) {
-    final incompleteTasks = tasks.where((task) => !task.completed).length;
-    scheduleNotification(
-      taskCount: incompleteTasks,
-      hour: 9,
-      minute: 0,
-    );
+  FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+    if (message.notification != null) {
+      notificationRepo.showLocalNotification(
+        title: message.notification!.title,
+        body: message.notification!.body,
+      );
+    }
   });
 });
