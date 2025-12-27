@@ -15,7 +15,7 @@ class HomePage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    ref.watch(taskNotificationListenerProvider);
+    ref.watch(fcmSetupProvider);
     final taskCategories = ref.watch(taskCountsProvider);
     final AppUser? appUser = ref.watch(userProfileProvider).value;
     final theme = Theme.of(context);
