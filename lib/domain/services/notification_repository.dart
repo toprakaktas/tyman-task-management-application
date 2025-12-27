@@ -1,25 +1,14 @@
 abstract class NotificationRepository {
-  Future<void> scheduleUpcomingTasksNotification({
-    required int taskCount,
-    int id = 2,
-    int hour = 9,
-    int minute = 0,
-  });
+  Future<void> requestPermission();
 
-  Future<void> scheduleNotification(
-      {int id = 1,
-      required String title,
-      required String body,
-      required int hour,
-      required int minute});
+  Future<String?> getToken();
 
-  Future<void> showNotification({
+  Stream<String?> get onTokenRefresh;
+
+  Future<void> showLocalNotification({
     int id = 0,
     String? title,
     String? body,
+    String? payload,
   });
-
-  Future<void> cancelNotification(int id);
-
-  Future<void> cancelAllNotifications();
 }

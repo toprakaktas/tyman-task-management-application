@@ -1,53 +1,30 @@
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:tyman/domain/services/notification_repository.dart';
 import 'package:tyman/core/notifications/notifications.dart';
 
 class NotificationService implements NotificationRepository {
-  final Notifications _notification = Notifications();
+  final FirebaseMessaging _fcm = FirebaseMessaging.instance;
+
+  final Notifications _notifications = Notifications();
 
   @override
-  Future<void> scheduleUpcomingTasksNotification(
-      {required int taskCount, int id = 2, int hour = 9, int minute = 0}) {
-    return _notification.scheduleUpcomingTasksNotification(
-        taskCount: taskCount, id: id, hour: hour, minute: minute);
+  Future<void> requestPermission() async {
+    await _fcm.requestPermission(
+        alert: true, badge: true, sound: true, provisional: false);
   }
 
   @override
-  Future<void> scheduleNotification({
-    int id = 1,
-    required String title,
-    required String body,
-    required int hour,
-    required int minute,
-  }) async {
-    return _notification.scheduleNotification(
-      id: id,
-      title: title,
-      body: body,
-      hour: hour,
-      minute: minute,
-    );
+  Future<String?> getToken() async {
+    return await _fcm.getToken();
   }
 
   @override
-  Future<void> showNotification({
-    int id = 0,
-    String? title,
-    String? body,
-  }) async {
-    return _notification.showNotification(
-      id: id,
-      title: title,
-      body: body,
-    );
-  }
+  Stream<String?> get onTokenRefresh => _fcm.onTokenRefresh;
 
   @override
-  Future<void> cancelNotification(int id) {
-    return _notification.cancelNotification(id);
-  }
-
-  @override
-  Future<void> cancelAllNotifications() {
-    return _notification.cancelAllNotifications();
+  Future<void> showLocalNotification(
+      {int id = 0, String? title, String? body, String? payload}) async {
+    return _notifications.showNotification(
+        id: id, title: title, body: body, payload: payload);
   }
 }
