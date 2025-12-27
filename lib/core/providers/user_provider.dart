@@ -4,6 +4,7 @@ import 'package:tyman/data/models/app_user.dart';
 import 'package:tyman/data/services/user_service.dart';
 import 'package:tyman/domain/usecases/user/fetch_user_profile.dart';
 import 'package:tyman/domain/usecases/user/get_user_stream.dart';
+import 'package:tyman/domain/usecases/user/toggle_notification_settings.dart';
 import 'package:tyman/domain/usecases/user/update_profile.dart';
 import 'package:tyman/domain/usecases/user/upload_profile_image.dart';
 
@@ -31,3 +32,6 @@ final userProfileProvider = StreamProvider<AppUser?>((ref) {
       loading: () => const Stream.empty(),
       error: (_, __) => const Stream.empty());
 });
+
+final toggleNotificationSettingsProvider = Provider<ToggleNotificationSettings>(
+    (ref) => ToggleNotificationSettings(ref.read(userServiceProvider)));

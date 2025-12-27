@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:tyman/data/models/app_user.dart';
 import 'package:tyman/domain/services/user_repository.dart';
 
@@ -90,5 +91,56 @@ class UserService implements UserRepository {
     TaskSnapshot snapshot = await uploadTask;
 
     return await snapshot.ref.getDownloadURL();
+  }
+
+  @override
+  Future<void> saveFCMToken(String token) async {
+    final uid = auth.currentUser!.uid;
+    try {
+      final TimezoneInfo timezone = await FlutterTimezone.getLocalTimezone();
+
+      final docSnapshot = await firestore.collection('users').doc(uid).get();
+      if (!docSnapshot.exists) return;
+
+      final data = docSnapshot.data();
+      final String currentToken = data?['fcmToken'];
+      final String currentTimezone = data?['timezone'];
+
+      bool isTokenChanged = currentToken != token;
+      bool isTimezoneChanged = currentTimezone != timezone.identifier;
+
+      if (!isTokenChanged && !isTimezoneChanged) {
+        if (kDebugMode) {
+          print('Token and timezone are the same. No update required.');
+        }
+        return;
+      }
+      await firestore.collection('users').doc(uid).update({
+        'fcmToken': token,
+        'timezone': timezone.identifier,
+        'lastTokenUpdate': FieldValue.serverTimestamp(),
+      });
+      if (kDebugMode) {
+        print('FCM Token or Timezone updated!');
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error saving FCM token: $e');
+      }
+    }
+  }
+
+  @override
+  Future<void> updateNotificationSettings(String uid, bool isEnabled) async {
+    try {
+      await firestore.collection('users').doc(uid).update({
+        'isNotificationsEnabled': isEnabled,
+      });
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error updating notification settings: $e');
+      }
+      throw Exception('Failed to update notification settings');
+    }
   }
 }
