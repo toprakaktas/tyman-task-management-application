@@ -3,8 +3,12 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tyman/core/constants/colors.dart';
 import 'package:tyman/core/providers/theme_provider.dart';
+import 'package:tyman/core/providers/user_provider.dart';
 import 'package:tyman/core/widgets/cached_user_avatar.dart';
 import 'package:tyman/data/models/app_user.dart';
+import 'package:flutter/cupertino.dart';
+
+enum HomeMenuAction { theme, notifications, language, privacy, help, about }
 
 class HomeAppBar extends ConsumerStatefulWidget implements PreferredSizeWidget {
   const HomeAppBar({super.key, this.user});
@@ -24,7 +28,7 @@ class _HomeAppBarState extends ConsumerState<HomeAppBar> {
       actions: [
         Padding(
           padding: const EdgeInsets.only(right: 8),
-          child: PopupMenuButton<int>(
+          child: PopupMenuButton<HomeMenuAction>(
             icon: Icon(Icons.settings_outlined,
                 color: theme.iconTheme.color, size: 25),
             shape: RoundedRectangleBorder(
@@ -33,14 +37,27 @@ class _HomeAppBarState extends ConsumerState<HomeAppBar> {
             color: settingsBackground,
             elevation: 8,
             offset: const Offset(0, 50),
+            onSelected: (HomeMenuAction action) {
+              switch (action) {
+                case HomeMenuAction.theme:
+                  break;
+                case HomeMenuAction.notifications:
+                  notificationBottomSheet(context);
+                  break;
+                case HomeMenuAction.language:
+                  break;
+                default:
+                  break;
+              }
+            },
             itemBuilder: (context) => [
               PopupMenuItem(
+                  value: HomeMenuAction.theme,
                   enabled: true,
-                  value: 0,
                   padding: EdgeInsets.zero,
                   child: const ThemeSwitch()),
               PopupMenuItem(
-                value: 1,
+                value: HomeMenuAction.notifications,
                 child: Row(
                   children: [
                     Icon(Icons.notifications_outlined,
@@ -58,7 +75,7 @@ class _HomeAppBarState extends ConsumerState<HomeAppBar> {
                 ),
               ),
               PopupMenuItem(
-                value: 2,
+                value: HomeMenuAction.language,
                 child: Row(
                   children: [
                     Icon(Icons.language_outlined,
@@ -76,7 +93,7 @@ class _HomeAppBarState extends ConsumerState<HomeAppBar> {
                 ),
               ),
               PopupMenuItem(
-                value: 3,
+                value: HomeMenuAction.privacy,
                 child: Row(
                   children: [
                     Icon(Icons.privacy_tip_outlined,
@@ -94,7 +111,7 @@ class _HomeAppBarState extends ConsumerState<HomeAppBar> {
                 ),
               ),
               PopupMenuItem(
-                value: 4,
+                value: HomeMenuAction.help,
                 child: Row(
                   children: [
                     Icon(Icons.help_outline, color: Colors.grey[800], size: 22),
@@ -111,7 +128,7 @@ class _HomeAppBarState extends ConsumerState<HomeAppBar> {
                 ),
               ),
               PopupMenuItem(
-                value: 5,
+                value: HomeMenuAction.about,
                 child: Row(
                   children: [
                     Icon(Icons.info_outline, color: Colors.grey[800], size: 22),
@@ -236,6 +253,102 @@ class ThemeSwitch extends ConsumerWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+void notificationBottomSheet(BuildContext context) {
+  showCupertinoModalPopup(
+      context: context,
+      builder: (context) {
+        return const NotificationSheet();
+      });
+}
+
+class NotificationSheet extends ConsumerWidget {
+  const NotificationSheet({super.key});
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+    final user = ref.watch(userProfileProvider);
+
+    return SafeArea(
+      child: Material(
+        color: Colors.transparent,
+        child: Container(
+            padding: const EdgeInsets.fromLTRB(20, 16, 20, 32),
+            decoration: BoxDecoration(
+                color: theme.colorScheme.surface,
+                borderRadius:
+                    const BorderRadius.vertical(top: Radius.circular(24))),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Center(
+                  child: Container(
+                    width: 40,
+                    height: 4,
+                    margin: const EdgeInsets.only(bottom: 8),
+                    decoration: BoxDecoration(
+                      color: theme.colorScheme.onSecondary,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                ),
+                Text('Notifications',
+                    style: TextStyle(
+                        color: theme.textTheme.bodyMedium!.color,
+                        fontWeight: theme.textTheme.bodyMedium!.fontWeight,
+                        fontSize: 20)),
+                const SizedBox(height: 20),
+                Row(
+                  children: [
+                    Icon(Icons.notifications_outlined,
+                        color: theme.iconTheme.color, size: 24),
+                    const SizedBox(width: 12),
+                    Expanded(
+                        child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('Daily Reminder',
+                            style: TextStyle(
+                              color: theme.textTheme.bodyMedium!.color,
+                              fontSize: theme.textTheme.bodyMedium!.fontSize,
+                            )),
+                        SizedBox(height: 2),
+                        Text(
+                          'Receive daily task summaries at 09:00',
+                          style: TextStyle(
+                            color: theme.textTheme.bodyMedium!.color,
+                            fontSize: 13,
+                          ),
+                        ),
+                      ],
+                    )),
+                    user.when(
+                      data: (user) {
+                        if (user == null) return const SizedBox();
+                        final bool isEnabled = user.isNotificationsEnabled;
+                        return CupertinoSwitch(
+                          value: isEnabled,
+                          onChanged: (value) async {
+                            HapticFeedback.selectionClick();
+
+                            await ref
+                                .read(userServiceProvider)
+                                .updateNotificationSettings(user.uid, value);
+                          },
+                        );
+                      },
+                      loading: () => const CupertinoActivityIndicator(),
+                      error: (_, __) => const Icon(Icons.error_outline),
+                    ),
+                  ],
+                )
+              ],
+            )),
       ),
     );
   }
