@@ -19,6 +19,6 @@ class AppUser {
         name: data['name'] ?? 'Earthling',
         email: data['email'] ?? '',
         photo: data['photoUrl'] as String? ?? 'assets/images/userAvatar.png',
-        isNotificationsEnabled: data['notificationsEnabled'] ?? true);
+        isNotificationsEnabled: data['isNotificationsEnabled'] ?? true);
   }
 }
